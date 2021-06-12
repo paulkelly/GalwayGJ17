@@ -37,6 +37,7 @@ public class ShipController : MonoBehaviour
     private void Update()
     {
 
+        int totalPlayer = _players.Count;
         int thrustingPlayers = 0;
         int cannoningPlayers = 0;
         Vector2 thrustVector = Vector2.zero;
@@ -56,18 +57,18 @@ public class ShipController : MonoBehaviour
             }
         }
 
-        if (thrustingPlayers > 0)
+        if (totalPlayer > 0)
         {
-            _ship.ThurstVector = thrustVector / thrustingPlayers;
+            _ship.ThurstVector = thrustVector / totalPlayer;
         }
         else
         {
             _ship.ThurstVector = Vector2.zero;
         }
 
-        if (cannoningPlayers > 0)
+        if (totalPlayer > 0)
         {
-            _ship.CannonVector = cannonVector / cannoningPlayers;
+            _ship.CannonVector = cannonVector / totalPlayer;
         }
         else
         {

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ThrusterView : MonoBehaviour
+public class Thruster : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _particleSystem;
     private ParticleSystem.EmissionModule _emissionModule;

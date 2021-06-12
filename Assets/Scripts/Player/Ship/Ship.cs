@@ -10,7 +10,8 @@ public class Ship : MonoBehaviour
 
     [SerializeField] private AnimationCurve _thrustMultiplierCurve;
 
-    private ThrusterView[] _thrusters;
+    private Thruster[] _thrusters;
+    private Cannon[] _cannons;
     
     // Input Paramaters
     public Vector2 ThurstVector { get; set; }
@@ -28,13 +29,13 @@ public class Ship : MonoBehaviour
 
     private void Start()
     {
-        _thrusters = GetComponentsInChildren<ThrusterView>();
+        _thrusters = GetComponentsInChildren<Thruster>();
+        _cannons = GetComponentsInChildren<Cannon>();
     }
 
     private void Update()
     {
         Vector2 forward = transform.rotation * Vector2.up;
-        //float currentAngle = Vector2.SignedAngle(forward, Vector2.up);
         _thrustMulti = _thrustMultiplierCurve.Evaluate(Mathf.Clamp01(Vector2.Dot(forward, ThurstVector)));
 
         float thrust = Mathf.Clamp01(ThrustAllocation * _thrustMulti);
@@ -42,6 +43,12 @@ public class Ship : MonoBehaviour
         foreach (var thruster  in _thrusters)
         {
             thruster.Thrust = thrust;
+        }
+        
+        foreach (var cannon  in _cannons)
+        {
+            cannon.Vector = CannonVector;
+            cannon.Strength = CannonAllocation;
         }
     }
 
