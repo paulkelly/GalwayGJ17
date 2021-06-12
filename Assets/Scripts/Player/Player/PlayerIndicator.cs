@@ -48,11 +48,13 @@ public class PlayerIndicator : MonoBehaviour
     private void Start()
     {
         PlayerManager.RegisterPlayer(this);
+        ShipController.RegisterPlayer(this);
     }
 
     private void OnDestroy()
     {
         PlayerManager.RemovePlayer(this);
+        ShipController.RemovePlayer(this);
     }
 
     private void Update()
