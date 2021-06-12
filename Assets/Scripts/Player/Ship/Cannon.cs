@@ -5,10 +5,13 @@ using UnityEngine;
 
 public class Cannon : MonoBehaviour
 {
+    private Ship _parentShip;
+    
     private const float InputDeadZone = 0.04f;
     private const float QuaternionRotationTime = 0.1f;
-    private const float MaxFireRate = 1/6f;
-    
+    private const float MaxFireRate = 1/8f;
+
+    public Vector2 ParentSpeed;
     public Vector2 Vector { get; set; }
     public float Strength { get; set; }
     
@@ -20,12 +23,17 @@ public class Cannon : MonoBehaviour
     // Shooting parameters
     private float _shotCooldown;
 
-    public void Update()
+    private void Awake()
+    {
+        _parentShip = GetComponentInParent<Ship>();
+    }
+
+    private void Update()
     {
         _shotCooldown += Time.deltaTime * Strength;
         if (_shotCooldown > MaxFireRate)
         {
-            BulletPool.Spawn(transform.position, transform.rotation * Vector2.up);
+            BulletPool.Spawn(_parentShip, transform.position, transform.rotation * Vector2.up, ParentSpeed);
             _shotCooldown -= MaxFireRate;
         }
     }
