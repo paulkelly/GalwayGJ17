@@ -5,7 +5,7 @@ using Photon.Pun;
 using Unity.Collections;
 using UnityEngine;
 
-public class Ship : MonoBehaviourPun
+public class Ship : MonoBehaviourPun, IPunObservable
 {
     private const float InputDeadZone = 0.04f;
     private const float QuaternionRotationTime = 0.3f;
@@ -39,6 +39,8 @@ public class Ship : MonoBehaviourPun
     private float _thrust;
     private Vector2 _velocity;
     private Vector2 _acceleration;
+    // Only used for non host players
+    private Vector3 _targetPosition;
 
     private void Start()
     {
@@ -72,7 +74,10 @@ public class Ship : MonoBehaviourPun
 
     private void HandleShipVelocity()
     {
-        if (!photonView.IsMine) return;
+        if (photonView.IsMine)
+        {
+            _targetPosition = transform.position;
+        }
         
         Vector2 targetVelocity = (_maxSpeed * _thrust) * ThurstVector;
         bool accelerating = Vector2.Dot(targetVelocity, _velocity) > 0 &&
@@ -81,14 +86,18 @@ public class Ship : MonoBehaviourPun
         _velocity = Vector2.SmoothDamp(_velocity, targetVelocity, ref _acceleration, accelerating ? _accelerateTime : _deccelerateTime);
 
         Vector2 moveVector = Time.deltaTime * _velocity;
-        Vector3 position = transform.position;
+        Vector3 position = Vector3.Lerp(transform.position, _targetPosition, 0.1f);
         transform.position = new Vector3(position.x + moveVector.x, position.y + moveVector.y,
             position.z);
     }
 
     private void FixedUpdate()
     {
-        if (!photonView.IsMine) return;
+        if (!photonView.IsMine)
+        {
+            _body.rotation = QuaternionUtil.SmoothDamp(_body.rotation, _targetRotation, ref _rotationVel,
+                QuaternionRotationTime);
+        }
         
         // Rotate towards input direction
         if (ThurstVector.sqrMagnitude > InputDeadZone)
@@ -100,5 +109,21 @@ public class Ship : MonoBehaviourPun
 
         _body.rotation = QuaternionUtil.SmoothDamp(_body.rotation, _targetRotation, ref _rotationVel,
             QuaternionRotationTime);
+    }
+    
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(_velocity);
+            stream.SendNext(_targetRotation);
+        }
+        else
+        {
+            _targetPosition = (Vector3)stream.ReceiveNext();
+            _velocity = (Vector2)stream.ReceiveNext();
+            _targetRotation = (Quaternion)stream.ReceiveNext();
+        }
     }
 }
