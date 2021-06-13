@@ -5,13 +5,14 @@ using UnityEngine;
 
 public class Cannon : MonoBehaviour
 {
+    [SerializeField] private Transform _spawnPoint;
     private Ship _parentShip;
     
     private const float InputDeadZone = 0.04f;
     private const float QuaternionRotationTime = 0.1f;
     private const float MaxFireRate = 1/8f;
 
-    public Vector2 ParentSpeed;
+    public Vector2 ParentSpeed { get; set; }
     public Vector2 Vector { get; set; }
     public float Strength { get; set; }
     
@@ -33,7 +34,7 @@ public class Cannon : MonoBehaviour
         _shotCooldown += Time.deltaTime * Strength;
         if (_shotCooldown > MaxFireRate)
         {
-            BulletPool.Spawn(_parentShip, transform.position, transform.rotation * Vector2.up, ParentSpeed);
+            BulletPool.Spawn(_parentShip, _spawnPoint.position, transform.rotation * Vector2.up, ParentSpeed);
             _shotCooldown -= MaxFireRate;
         }
     }

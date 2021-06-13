@@ -5299,6 +5299,10 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6940900631339389388, guid: 7a543dac3ee6cfa40a012c09d693b601, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6940900632257997978, guid: 7a543dac3ee6cfa40a012c09d693b601, type: 3}
       propertyPath: m_Name
       value: Ship
@@ -5346,6 +5350,10 @@ PrefabInstance:
     - target: {fileID: 6940900632257997979, guid: 7a543dac3ee6cfa40a012c09d693b601, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7607189111432806462, guid: 7a543dac3ee6cfa40a012c09d693b601, type: 3}
+      propertyPath: sceneViewId
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a543dac3ee6cfa40a012c09d693b601, type: 3}

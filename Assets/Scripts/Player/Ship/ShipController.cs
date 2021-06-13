@@ -6,6 +6,7 @@ public class ShipController : MonoBehaviour
 {
     [SerializeField] private Ship _ship;
 
+    private const float InputDeadZone = 0.04f;
     private const float ThrustCannonThresholds = 0.3f;
     private static ShipController _instance;
 
@@ -37,7 +38,7 @@ public class ShipController : MonoBehaviour
     private void Update()
     {
 
-        int totalPlayer = _players.Count;
+        int totalPlayers = _players.Count;
         int thrustingPlayers = 0;
         int cannoningPlayers = 0;
         Vector2 thrustVector = Vector2.zero;
@@ -47,7 +48,15 @@ public class ShipController : MonoBehaviour
         {
             if (player.Thrust > ThrustCannonThresholds)
             {
-                thrustVector += player.InputDirection * player.Thrust;
+                if (player.InputDirection.sqrMagnitude > InputDeadZone)
+                {
+                    thrustVector += player.InputDirection * player.Thrust;
+                }
+                else
+                {
+                    thrustVector += _ship.ForwardVector;
+                }
+
                 thrustingPlayers++;
             }
             if (player.Cannons > ThrustCannonThresholds)
@@ -57,25 +66,18 @@ public class ShipController : MonoBehaviour
             }
         }
 
-        if (totalPlayer > 0)
+        if (totalPlayers > 0)
         {
-            _ship.ThurstVector = thrustVector / totalPlayer;
+            _ship.ThurstVector = thrustVector / totalPlayers;
+            _ship.ThrustAllocation = (float)thrustingPlayers/totalPlayers;
+            
+            _ship.CannonVector = cannonVector / totalPlayers;
+            _ship.CannonAllocation = (float)cannoningPlayers/totalPlayers;
         }
         else
         {
             _ship.ThurstVector = Vector2.zero;
-        }
-
-        if (totalPlayer > 0)
-        {
-            _ship.CannonVector = cannonVector / totalPlayer;
-        }
-        else
-        {
             _ship.CannonVector = Vector2.zero;
         }
-
-        _ship.ThrustAllocation = thrustVector.magnitude;
-        _ship.CannonAllocation = cannonVector.magnitude;
     }
 }

@@ -1,13 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using Unity.Collections;
 using UnityEngine;
 
-public class Ship : MonoBehaviour
+public class Ship : MonoBehaviourPun
 {
     private const float InputDeadZone = 0.04f;
     private const float QuaternionRotationTime = 0.3f;
+
+    [SerializeField] private Transform _body;
     
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _accelerateTime;
@@ -23,6 +26,8 @@ public class Ship : MonoBehaviour
     public Vector2 CannonVector { get; set; }
     public float ThrustAllocation { get; set; }
     public float CannonAllocation { get; set; }
+    // Thrust vector defaults to ForwardVector if button pressed with stick input
+    public Vector2 ForwardVector { get; private set; }
 
     // Rotation Vars
     private float _inputAngle;
@@ -39,12 +44,14 @@ public class Ship : MonoBehaviour
     {
         _thrusters = GetComponentsInChildren<Thruster>();
         _cannons = GetComponentsInChildren<Cannon>();
+        
+        ForwardVector = _body.rotation * Vector2.up;
     }
 
     private void Update()
     {
-        Vector2 forward = transform.rotation * Vector2.up;
-        _thrustMulti = _thrustMultiplierCurve.Evaluate(Mathf.Clamp01(Vector2.Dot(forward, ThurstVector)));
+        ForwardVector = _body.rotation * Vector2.up;
+        _thrustMulti = _thrustMultiplierCurve.Evaluate(Mathf.Clamp01(Vector2.Dot(ForwardVector, ThurstVector)));
 
         _thrust = Mathf.Clamp01(ThrustAllocation * _thrustMulti);
      
@@ -65,8 +72,8 @@ public class Ship : MonoBehaviour
 
     private void HandleShipVelocity()
     {
-        // Vector2 thrustVector = (_acceleration * _thrust * Time.deltaTime) * ThurstVector;
-        // _velocity = Vector2.ClampMagnitude(_velocity + thrustVector, _maxSpeed);
+        if (!photonView.IsMine) return;
+        
         Vector2 targetVelocity = (_maxSpeed * _thrust) * ThurstVector;
         bool accelerating = Vector2.Dot(targetVelocity, _velocity) > 0 &&
                             targetVelocity.sqrMagnitude > _velocity.sqrMagnitude;
@@ -81,6 +88,8 @@ public class Ship : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!photonView.IsMine) return;
+        
         // Rotate towards input direction
         if (ThurstVector.sqrMagnitude > InputDeadZone)
         {
@@ -89,7 +98,7 @@ public class Ship : MonoBehaviour
         
         _targetRotation = Quaternion.AngleAxis(-_inputAngle, Vector3.forward);
 
-        transform.rotation = QuaternionUtil.SmoothDamp(transform.rotation, _targetRotation, ref _rotationVel,
+        _body.rotation = QuaternionUtil.SmoothDamp(_body.rotation, _targetRotation, ref _rotationVel,
             QuaternionRotationTime);
     }
 }
