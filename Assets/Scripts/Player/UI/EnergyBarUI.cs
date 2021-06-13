@@ -45,7 +45,7 @@ public class EnergyBarUI : MonoBehaviour
         _cannon = Mathf.MoveTowards(_cannon, _targetCannonAllocation, UpdateSpeed * Time.deltaTime);
         _shield = Mathf.MoveTowards(_shield, _targetShields, UpdateSpeed * Time.deltaTime);
 
-        _energyTransform.localScale = new Vector3(1, _energy, 1);
+        _energyTransform.localScale = new Vector3(_energy, 1, 1);
         _thrustTransform.localScale = new Vector3(_thrust, 1, 1);
         _cannonTransform.localScale = new Vector3(_cannon, 1, 1);
         _shieldTransform.localScale = new Vector3(_shield, 1, 1);

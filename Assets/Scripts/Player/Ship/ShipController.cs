@@ -73,11 +73,11 @@ public class ShipController : MonoBehaviour
 
         if (totalInputs > 0)
         {
-            _ship.ThurstVector = thrustVector / totalInputs;
-            _ship.ThrustAllocation = (float)thrustingPlayers/totalInputs;
+            _ship.ThurstVector = thrustVector.normalized;
+            _ship.ThrustAllocation = thrustingPlayers/totalInputs;
             
-            _ship.CannonVector = cannonVector / totalInputs;
-            _ship.CannonAllocation = (float)cannoningPlayers/totalInputs;
+            _ship.CannonVector = cannonVector.normalized;
+            _ship.CannonAllocation = cannoningPlayers/totalInputs;
         }
         else
         {
