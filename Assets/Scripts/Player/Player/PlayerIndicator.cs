@@ -11,7 +11,7 @@ public class PlayerIndicator : MonoBehaviour
     [SerializeField]
     private Transform _inputDirectionIndicator;
 
-    private const float InputDeadZone = 0.04f;
+    public const float InputDeadZone = 0.04f;
     
     private bool _hasBeenPositioned;
     private bool _moving;

@@ -10,6 +10,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 {
     [SerializeField]
     private PlayerIndicator _playerIndicator;
+    [SerializeField]
+    private PlayerInputFeedback _inputFeedback;
+    [SerializeField] 
+    private SpriteRenderer _myPlayerSpriteRenderer;
     
     private Player _player;
     
@@ -21,6 +25,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (photonView.IsMine)
         {
             _player = ReInput.players.GetPlayer(0);
+            _myPlayerSpriteRenderer.enabled = true;
+        }
+        else
+        {
+            _myPlayerSpriteRenderer.enabled = false;
         }
     }
 
@@ -36,6 +45,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         _playerIndicator.InputDirection = InputDirection;
         _playerIndicator.Thrust = Thrust;
         _playerIndicator.Cannons = Cannons;
+
+        _inputFeedback.Moving = InputDirection.sqrMagnitude > PlayerIndicator.InputDeadZone;
+        _inputFeedback.Thrusting = Thrust > 0.3f;
+        _inputFeedback.Shooting = Cannons > 0.3f;
     }
     
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
