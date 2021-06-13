@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class Cannon : MonoBehaviour
+public class Cannon : MonoBehaviourPun
 {
     [SerializeField] private Transform _spawnPoint;
     private Ship _parentShip;
@@ -31,13 +32,27 @@ public class Cannon : MonoBehaviour
 
     private void Update()
     {
+        if (!photonView.IsMine) return;
+        
         _shotCooldown += Time.deltaTime * Strength;
         if (_shotCooldown > MaxFireRate)
         {
-            BulletPool.Spawn(_parentShip, _spawnPoint.position, transform.rotation * Vector2.up, ParentSpeed);
+            SpawnBullet();
             _shotCooldown -= MaxFireRate;
         }
     }
+    
+    public void SpawnBullet()
+    {
+        photonView.RPC("SpawnBulletRPC", RpcTarget.All, _spawnPoint.position, transform.rotation * Vector2.up, ParentSpeed);
+    }
+
+    [PunRPC]
+    private void SpawnBulletRPC(Vector3 position, Vector2 forward, Vector2 velocity)
+    {
+        BulletPool.Spawn(_parentShip, position, forward, velocity);
+    }
+
     
     private void FixedUpdate()
     {
