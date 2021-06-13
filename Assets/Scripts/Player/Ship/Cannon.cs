@@ -44,7 +44,7 @@ public class Cannon : MonoBehaviourPun
     
     public void SpawnBullet()
     {
-        photonView.RPC("SpawnBulletRPC", RpcTarget.All, _spawnPoint.position, transform.rotation * Vector2.up, ParentSpeed);
+        photonView.RPC("SpawnBulletRPC", RpcTarget.All, _spawnPoint.position, (Vector2)(transform.rotation * Vector2.up), ParentSpeed);
     }
 
     [PunRPC]
