@@ -414,7 +414,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0857227811df4964a9981db070d43542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inactiveColor: {r: 0, g: 1, b: 0, a: 0.78431374}
+  _inactiveColor: {r: 0, g: 1, b: 0, a: 0.23529412}
   _activeColor: {r: 1, g: 1, b: 1, a: 0.9411765}
   _thrustingColor: {r: 1, g: 0, b: 0, a: 0.9411765}
   _shootingColor: {r: 1, g: 1, b: 0, a: 0.9411765}
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0857227811df4964a9981db070d43542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inactiveColor: {r: 0, g: 1, b: 0, a: 0.78431374}
+  _inactiveColor: {r: 0, g: 1, b: 0, a: 0.23529412}
   _activeColor: {r: 1, g: 1, b: 1, a: 0.9411765}
   _thrustingColor: {r: 1, g: 0, b: 0, a: 0.9411765}
   _shootingColor: {r: 1, g: 1, b: 0, a: 0.9411765}

@@ -61,14 +61,13 @@ public class ShipController : MonoBehaviour
                 }
 
                 thrustingPlayers +=magnitude;
-                totalInputs++;
             }
             if (player.Cannons > ThrustCannonThresholds)
             {
                 cannonVector += player.InputDirection * player.Cannons;
                 cannoningPlayers += player.Cannons;
-                totalInputs++;
             }
+            totalInputs++;
         }
 
         if (totalInputs > 0)
