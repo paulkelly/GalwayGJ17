@@ -73,6 +73,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerIndicator: {fileID: -636255987434896486}
   _inputFeedback: {fileID: 2600201213199273399}
+  _myPlayerSpriteRenderer: {fileID: 3466780915229522408}
 --- !u!114 &-636255987434896486
 MonoBehaviour:
   m_ObjectHideFlags: 0
