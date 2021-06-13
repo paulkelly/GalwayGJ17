@@ -6,7 +6,7 @@ public class ShipController : MonoBehaviour
 {
     [SerializeField] private Ship _ship;
 
-    private const float InputDeadZone = 0.04f;
+    private const float InputDeadZone = 0.2f;
     private const float ThrustCannonThresholds = 0.3f;
     private static ShipController _instance;
 
@@ -38,9 +38,9 @@ public class ShipController : MonoBehaviour
     private void Update()
     {
 
-        int totalPlayers = _players.Count;
-        int thrustingPlayers = 0;
-        int cannoningPlayers = 0;
+        float totalInputs = 0;
+        float thrustingPlayers = 0;
+        float cannoningPlayers = 0;
         Vector2 thrustVector = Vector2.zero;
         Vector2 cannonVector = Vector2.zero;
 
@@ -48,34 +48,41 @@ public class ShipController : MonoBehaviour
         {
             if (player.Thrust > ThrustCannonThresholds)
             {
-                if (player.InputDirection.sqrMagnitude > InputDeadZone)
+                float magnitude = player.InputDirection.magnitude;
+                if (magnitude > InputDeadZone)
                 {
-                    thrustVector += player.InputDirection * player.Thrust;
+                    thrustVector += player.InputDirection;
+                    magnitude *= player.Thrust;
                 }
                 else
                 {
                     thrustVector += _ship.ForwardVector;
+                    magnitude = player.Thrust;
                 }
 
-                thrustingPlayers++;
+                thrustingPlayers +=magnitude;
+                totalInputs++;
             }
             if (player.Cannons > ThrustCannonThresholds)
             {
                 cannonVector += player.InputDirection * player.Cannons;
-                cannoningPlayers++;
+                cannoningPlayers += player.Cannons;
+                totalInputs++;
             }
         }
 
-        if (totalPlayers > 0)
+        if (totalInputs > 0)
         {
-            _ship.ThurstVector = thrustVector / totalPlayers;
-            _ship.ThrustAllocation = (float)thrustingPlayers/totalPlayers;
+            _ship.ThurstVector = thrustVector / totalInputs;
+            _ship.ThrustAllocation = (float)thrustingPlayers/totalInputs;
             
-            _ship.CannonVector = cannonVector / totalPlayers;
-            _ship.CannonAllocation = (float)cannoningPlayers/totalPlayers;
+            _ship.CannonVector = cannonVector / totalInputs;
+            _ship.CannonAllocation = (float)cannoningPlayers/totalInputs;
         }
         else
         {
+            _ship.ThrustAllocation = 0;
+            _ship.CannonAllocation = 0;
             _ship.ThurstVector = Vector2.zero;
             _ship.CannonVector = Vector2.zero;
         }

@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class Ship : MonoBehaviourPun, IPunObservable
 {
+    public const float MaxShield = 100;
     private const float InputDeadZone = 0.04f;
     private const float QuaternionRotationTime = 0.3f;
 
@@ -20,6 +21,8 @@ public class Ship : MonoBehaviourPun, IPunObservable
 
     private Thruster[] _thrusters;
     private Cannon[] _cannons;
+
+    public float Shield { get; set; } = MaxShield;
     
     // Input Paramaters
     public Vector2 ThurstVector { get; set; }
@@ -68,8 +71,13 @@ public class Ship : MonoBehaviourPun, IPunObservable
         {
             cannon.ParentSpeed = _velocity;
             cannon.Vector = CannonVector;
-            cannon.Strength = CannonAllocation;
+            cannon.Strength = Mathf.Clamp01(CannonAllocation);
         }
+
+        float remainingEnergy = 1 - Mathf.Clamp01(_thrust + CannonAllocation);
+        Shield = Mathf.Clamp(Shield + (remainingEnergy * Time.deltaTime), 0 ,MaxShield);
+        
+        EnergyBarUI.UpdateUI(remainingEnergy, _thrust, Mathf.Clamp01(CannonAllocation), Shield/MaxShield);
     }
 
     private void HandleShipVelocity()
