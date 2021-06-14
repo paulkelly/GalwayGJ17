@@ -16,18 +16,20 @@ public class EnergyBarUI : MonoBehaviour
     private static float _targetThrustAllocation;
     private static float _targetCannonAllocation;
     private static float _targetShields;
+    private static bool _shieldDisabled;
 
     private float _energy;
     private float _thrust;
     private float _cannon;
     private float _shield;
 
-    public static void UpdateUI(float energyAllocation, float thrustAllocation, float cannonAllocation, float shields)
+    public static void UpdateUI(float energyAllocation, float thrustAllocation, float cannonAllocation, float shields, bool shieldDisabled)
     {
         _targetEnergyAllocation = energyAllocation;
         _targetThrustAllocation = thrustAllocation;
         _targetCannonAllocation = cannonAllocation;
         _targetShields = shields;
+        _shieldDisabled = shieldDisabled;
     }
 
     private void Start()
@@ -48,6 +50,7 @@ public class EnergyBarUI : MonoBehaviour
         _energyTransform.localScale = new Vector3(_energy, 1, 1);
         _thrustTransform.localScale = new Vector3(_thrust, 1, 1);
         _cannonTransform.localScale = new Vector3(_cannon, 1, 1);
+        
         _shieldTransform.localScale = new Vector3(_shield, 1, 1);
     }
 }
