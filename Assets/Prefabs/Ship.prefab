@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 752605499019869677}
   - component: {fileID: 6646608455028435932}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ShieldMask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2689244331835155510}
   - component: {fileID: 6594727630655464814}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ShieldPerm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3452321498721029253}
   - component: {fileID: 4786430492885748845}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Follow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 8396273079069986870}
   - component: {fileID: 7476120578013342499}
   - component: {fileID: 6161926850114444830}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ShieldCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -309,7 +309,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6940900632257997979}
   - component: {fileID: 7607189111432806462}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ship
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -367,7 +367,7 @@ GameObject:
   - component: {fileID: 7194348860752755915}
   - component: {fileID: 6960744915169031691}
   - component: {fileID: 2715012235259889463}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -421,9 +421,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxSpeed: 20
-  _accelerateTime: 0.4
+  _minAccelerateTime: 0.8
+  _maxAccelerateTime: 0.4
   _deccelerateTime: 0.8
-  _thrustMultiplierCurve:
+  _thrustAngleMultiplierCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -465,6 +466,30 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _thrustInputMultiplierCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.48172864
+      outSlope: 0.48172864
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.066687286
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!50 &2715012235259889463
 Rigidbody2D:
   serializedVersion: 4
@@ -496,7 +521,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6118579197388376957}
   - component: {fileID: 899842026770224114}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BodySprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -578,7 +603,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1066020647310792939}
   - component: {fileID: 2931189753508172886}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -621,7 +646,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2003291672152500888}
   - component: {fileID: 5319062937355280926}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BodyColliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -681,7 +706,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6141680328050808332}
   - component: {fileID: 1484525132327793288}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ShieldRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -724,6 +749,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6940900632273005268}
     m_Modifications:
+    - target: {fileID: 2931081934256551554, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7786721811125289866, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -772,6 +801,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gun1
       objectReference: {fileID: 0}
+    - target: {fileID: 7786721811125289867, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
 --- !u!4 &6940900631339389387 stripped
@@ -794,9 +827,17 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.18
       objectReference: {fileID: 0}
+    - target: {fileID: 3043301928394622831, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4116398165803200907, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
       propertyPath: m_Name
       value: Thruster1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116398165803200907, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5405451285520152200, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
       propertyPath: m_RootOrder
@@ -856,6 +897,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6940900632273005268}
     m_Modifications:
+    - target: {fileID: 2931081934256551554, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7786721811125289866, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -904,6 +949,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gun2
       objectReference: {fileID: 0}
+    - target: {fileID: 7786721811125289867, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5774ef5fe10d5e54f95706a7ee5fd010, type: 3}
 --- !u!4 &890857730039504067 stripped
@@ -926,9 +975,17 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.18
       objectReference: {fileID: 0}
+    - target: {fileID: 3043301928394622831, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4116398165803200907, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
       propertyPath: m_Name
       value: Thruster2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116398165803200907, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5405451285520152200, guid: e97f1917d460d34498d3d49a64a85819, type: 3}
       propertyPath: m_RootOrder

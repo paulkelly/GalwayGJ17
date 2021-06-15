@@ -21,8 +21,8 @@ public class Thruster : MonoBehaviour
 
     private void Update()
     {
-        _mainModule.startLifetimeMultiplier = 0.6f*Thrust;
-        _mainModule.startSizeMultiplier = 1.5f * (Thrust*Thrust);
+        _mainModule.startLifetimeMultiplier = Mathf.Lerp(0.2f, 0.6f, Thrust);
+        _mainModule.startSizeMultiplier = Mathf.Lerp(0.3f, 1.5f, Thrust*Thrust);
         if (Thrust > 0.05f)
         {
             _emissionModule.rateOverTime = _defaultRate;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Ship : MonoBehaviourPun, IPunObservable
 {
@@ -15,10 +16,11 @@ public class Ship : MonoBehaviourPun, IPunObservable
     private const float AngularVelStopTime = 0.3f;
 
     [SerializeField] private float _maxSpeed;
-    [SerializeField] private float _accelerateTime;
+    [SerializeField] private float _minAccelerateTime;
+    [SerializeField] private float _maxAccelerateTime;
     [SerializeField] private float _deccelerateTime;
 
-    [SerializeField] private AnimationCurve _thrustMultiplierCurve;
+    [SerializeField] private AnimationCurve _thrustAngleMultiplierCurve;
 
     private Rigidbody2D _rigidbody;
     private Thruster[] _thrusters;
@@ -65,7 +67,6 @@ public class Ship : MonoBehaviourPun, IPunObservable
         {
             Shield -= damage;
         }
-
     }
 
     private void Start()
@@ -85,10 +86,13 @@ public class Ship : MonoBehaviourPun, IPunObservable
             if (_shieldDisabledTime > ShieldDisableTime) ShieldDisabled = false;
         }
         ForwardVector = transform.rotation * Vector2.up;
-        _thrustMulti = _thrustMultiplierCurve.Evaluate(Mathf.Clamp01(Vector2.Dot(ForwardVector, ThurstVector)));
+        _thrustMulti = _thrustAngleMultiplierCurve.Evaluate(Mathf.Clamp01(Vector2.Dot(ForwardVector, ThurstVector)));
 
         _thrust = Mathf.Clamp01(ThrustAllocation * _thrustMulti);
-     
+        
+        float remainingEnergy = 1 - Mathf.Clamp01(_thrust + CannonAllocation);
+        Shield = Mathf.Clamp(Shield + ((remainingEnergy*remainingEnergy) * ShieldRechargeRate * Time.deltaTime), 0 ,MaxShield);
+
         foreach (var thruster  in _thrusters)
         {
             thruster.Thrust = _thrust;
@@ -101,9 +105,6 @@ public class Ship : MonoBehaviourPun, IPunObservable
             cannon.Strength = Mathf.Clamp01(CannonAllocation);
         }
 
-        float remainingEnergy = 1 - Mathf.Clamp01(_thrust + CannonAllocation);
-        Shield = Mathf.Clamp(Shield + ((remainingEnergy*remainingEnergy) * ShieldRechargeRate * Time.deltaTime), 0 ,MaxShield);
-        
         EnergyBarUI.UpdateUI(remainingEnergy, _thrust, Mathf.Clamp01(CannonAllocation), Shield/MaxShield, ShieldDisabled);
     }
 
@@ -115,10 +116,10 @@ public class Ship : MonoBehaviourPun, IPunObservable
         }
         
         Vector2 targetVelocity = (_maxSpeed * _thrust) * ThurstVector;
-        bool accelerating = Vector2.Dot(targetVelocity, _velocity) > 0 &&
-                            targetVelocity.sqrMagnitude > _velocity.sqrMagnitude;
+        bool accelerating = targetVelocity.sqrMagnitude > _velocity.sqrMagnitude;
 
-        _velocity = Vector2.SmoothDamp(_velocity, targetVelocity, ref _acceleration, accelerating ? _accelerateTime : _deccelerateTime);
+        float accelerateTime = Mathf.Lerp(_minAccelerateTime, _maxAccelerateTime, _thrust);
+        _velocity = Vector2.SmoothDamp(_velocity, targetVelocity, ref _acceleration, accelerating ? accelerateTime : _deccelerateTime);
 
         _rigidbody.velocity = _velocity;
         // Vector2 moveVector = Time.deltaTime * _velocity;

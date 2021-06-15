@@ -7,12 +7,12 @@ public static class DamageUtil
     public const float MinMass = 1;
     public const float MaxMass = 40;
     public const float MinMassDamageMulti = 1;
-    public const float MaxMassDamageMulti = 4;
+    public const float MaxMassDamageMulti = 3;
 
     public const float MinImpactVelocity = 1;
-    public const float MaxImpactVelocity = 40;
+    public const float MaxImpactVelocity = 60;
     public const float MinImpactVelocityDamageMulti = 1;
-    public const float MaxImpactVelocityDamageMulti = 4;
+    public const float MaxImpactVelocityDamageMulti = 8;
 
     public const float BaseShieldDamage = 5f;
 

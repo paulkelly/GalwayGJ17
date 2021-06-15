@@ -97,7 +97,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83bce69d83bc0774fb19fe610dc95cb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteMask: {fileID: 0}
+  _maxHealth: 1
+  _splitObjects: []
 --- !u!50 &5436529715411372192
 Rigidbody2D:
   serializedVersion: 4
@@ -129,6 +130,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7794161803327211043}
   - component: {fileID: 7794161803327211068}
+  - component: {fileID: 3322646861235996226}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -166,3 +168,16 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.76, y: 2.05}
   m_Direction: 0
+--- !u!114 &3322646861235996226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7794161803327211042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b64dcf7859eef448afdaff7b98a7b7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _parent: {fileID: 3287997347257925866}

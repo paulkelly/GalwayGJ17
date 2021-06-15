@@ -6,12 +6,12 @@ public class BulletPool : ObjectPool<Bullet>
 {
     private static BulletPool _instance;
 
-    public static void Spawn(Ship ship, Vector3 position, Vector2 forward, Vector2 inheritedVelocity)
+    public static void Spawn(Ship ship, float energy, Vector3 position, Vector2 forward, Vector2 inheritedVelocity)
     {
         if (_instance != null)
         {
             Bullet spawnedBullet = _instance.GetObject();
-            spawnedBullet.Spawn(ship, position, forward, inheritedVelocity, () =>
+            spawnedBullet.Spawn(ship, energy, position, forward, inheritedVelocity, () =>
             {
                 _instance.ReleaseObject(spawnedBullet);
             });

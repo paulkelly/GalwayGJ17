@@ -9,9 +9,14 @@ public class Cannon : MonoBehaviourPun
     [SerializeField] private Transform _spawnPoint;
     private Ship _parentShip;
     
+    public const float MinEnergy = 1;
+    public const float MaxEnergy = 4;
+    
     private const float InputDeadZone = 0.04f;
-    private const float QuaternionRotationTime = 0.1f;
-    private const float MaxFireRate = 1/8f;
+    private const float QuaternionRotationTime = 0.05f;
+    private const float MinFireRate = 1f;
+    private const float MaxFireRate = 3f;
+    private const float MinAngleToFire = 15;
 
     public Vector2 ParentSpeed { get; set; }
     public Vector2 Vector { get; set; }
@@ -28,29 +33,43 @@ public class Cannon : MonoBehaviourPun
     private void Awake()
     {
         _parentShip = GetComponentInParent<Ship>();
+        _shotCooldown = 1;
     }
 
     private void Update()
     {
         if (!photonView.IsMine) return;
+
+        bool ableToFire = Strength > 0.05f;
+        // if (ableToFire)
+        // {
+        //     ableToFire &= Vector2.Angle(transform.rotation * Vector2.up, Vector) < MinAngleToFire;
+        // }
         
-        _shotCooldown += Time.deltaTime * Strength;
-        if (_shotCooldown > MaxFireRate)
+        if (ableToFire)
         {
-            SpawnBullet();
-            _shotCooldown -= MaxFireRate;
+            _shotCooldown += Mathf.Lerp(MinFireRate, MaxFireRate, Strength)*Time.deltaTime;
+            if (_shotCooldown >= 0.99)
+            {
+                SpawnBullet(Mathf.Lerp(MinEnergy, MaxEnergy, Strength));
+                _shotCooldown = Mathf.Clamp01(_shotCooldown - 1);
+            }
+        }
+        else
+        {
+            _shotCooldown = Mathf.Clamp01(_shotCooldown - MinFireRate*Time.deltaTime);
         }
     }
     
-    public void SpawnBullet()
+    public void SpawnBullet(float energy)
     {
-        photonView.RPC("SpawnBulletRPC", RpcTarget.All, _spawnPoint.position, (Vector2)(transform.rotation * Vector2.up), ParentSpeed);
+        photonView.RPC("SpawnBulletRPC", RpcTarget.All, _spawnPoint.position, energy, (Vector2)(transform.rotation * Vector2.up), ParentSpeed);
     }
 
     [PunRPC]
-    private void SpawnBulletRPC(Vector3 position, Vector2 forward, Vector2 velocity)
+    private void SpawnBulletRPC(Vector3 position, float energy, Vector2 forward, Vector2 velocity)
     {
-        BulletPool.Spawn(_parentShip, position, forward, velocity);
+        BulletPool.Spawn(_parentShip, energy, position, forward, velocity);
     }
 
     

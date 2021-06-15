@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Shield : MonoBehaviourPun
 {
-    public const float ShieldShowTime = 0.4f;
+    public const float ShieldShowTime = 0.6f;
     
     [SerializeField] private Ship _ship;
     [SerializeField] private ShipHitPool _shipHitPool;
@@ -19,7 +19,9 @@ public class Shield : MonoBehaviourPun
     private Color _defaultShieldColor;
     private float _shieldMultiplier;
     private float _lastHitTime = 0;
-    
+
+    private List<RecentlyHitBodys> _recentlyHitBodys = new List<RecentlyHitBodys>();
+    private List<RecentlyHitBodys> _toRemove = new List<RecentlyHitBodys>();
 
     private void Start()
     {
@@ -36,6 +38,21 @@ public class Shield : MonoBehaviourPun
         if (_lastHitTime < ShieldShowTime) _lastHitTime += Time.deltaTime;
         float shieldAlpha = Mathf.Lerp(1, 0, _lastHitTime / ShieldShowTime);
         _shieldHitRenderer.color = new Color(1, 1, 1, shieldAlpha*_shieldMultiplier);
+
+        foreach (var body in _recentlyHitBodys)
+        {
+            body.TimeToIgnore -= Time.deltaTime;
+            if (body.TimeToIgnore < 0)
+            {
+                _toRemove.Add(body);
+            }
+        }
+
+        foreach (var toRemove in _toRemove)
+        {
+            _recentlyHitBodys.Remove(toRemove);
+        }
+        _toRemove.Clear();
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -43,14 +60,40 @@ public class Shield : MonoBehaviourPun
         if (photonView.IsMine)
         {
             //TODO: Don't allow consecutive hits from same collider
-            if (other.otherRigidbody != null)
+            Rigidbody2D otherBody = other.rigidbody;
+            if (otherBody != null)
             {
-                _lastHitTime = 0;
                 Vector2 direction = other.collider.transform.position - transform.position;
                 ShieldHit(other.contacts[0].point, direction);
-                _ship.HandleCollision(other.rigidbody.mass, other.relativeVelocity.magnitude);
+                
+                _lastHitTime = 0;
+
+                if (HasNotCollidedRecently(otherBody))
+                {
+                    float relativeVelocityMag = other.relativeVelocity.magnitude;
+                    _ship.HandleCollision(otherBody.mass, relativeVelocityMag);
+
+                    IHittable hittable = other.transform.GetComponent<IHittable>();
+                    if (hittable != null)
+                    {
+                        hittable.Hit(other.relativeVelocity, other.contacts[0].point,
+                            Mathf.Clamp(relativeVelocityMag / 3, 1, 9));
+                    }
+                    
+                    _recentlyHitBodys.Add(new RecentlyHitBodys {Rigidbody = otherBody, TimeToIgnore = 0.3f});
+                }
             }
         }
+    }
+
+    private bool HasNotCollidedRecently(Rigidbody2D otherBody)
+    {
+        foreach (var body in _recentlyHitBodys)
+        {
+            if (body.Rigidbody.Equals(otherBody)) return false;
+        }
+
+        return true;
     }
 
     public void ShieldHit(Vector2 position, Vector2 direction)
@@ -63,4 +106,10 @@ public class Shield : MonoBehaviourPun
     {
         _shipHitPool.Spawn(position, direction);
     }
+}
+
+public class RecentlyHitBodys
+{
+    public Rigidbody2D Rigidbody;
+    public float TimeToIgnore;
 }

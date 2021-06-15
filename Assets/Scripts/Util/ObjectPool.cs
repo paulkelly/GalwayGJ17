@@ -31,7 +31,7 @@ public class ObjectPool<T> : MonoBehaviour where T : PooledObject
 
     public T GetObject()
     {
-        if (_available.Count != 0)
+        if (_available.Count > 0)
         {
             T obj = _available[0];
             _inUse.Add(obj);

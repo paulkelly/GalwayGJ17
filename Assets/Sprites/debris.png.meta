@@ -23,6 +23,27 @@ TextureImporter:
   - first:
       213: -1436228342886831569
     second: debris_6
+  - first:
+      213: -7759988620672419126
+    second: debris_7
+  - first:
+      213: -1580921576647938986
+    second: debris_8
+  - first:
+      213: -8266121033952888657
+    second: debris_9
+  - first:
+      213: -3916790689450733119
+    second: debris_10
+  - first:
+      213: 6853613751153627574
+    second: debris_11
+  - first:
+      213: -3239173368054345064
+    second: debris_12
+  - first:
+      213: 4181801828977696857
+    second: debris_13
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -127,8 +148,8 @@ TextureImporter:
       name: debris_0
       rect:
         serializedVersion: 2
-        x: 76
-        y: 517
+        x: 30
+        y: 543
         width: 185
         height: 155
       alignment: 0
@@ -148,10 +169,10 @@ TextureImporter:
       name: debris_1
       rect:
         serializedVersion: 2
-        x: 393
-        y: 498
-        width: 179
-        height: 141
+        x: 261
+        y: 595
+        width: 116
+        height: 94
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -169,10 +190,10 @@ TextureImporter:
       name: debris_2
       rect:
         serializedVersion: 2
-        x: 717
-        y: 606
-        width: 61
-        height: 64
+        x: 393
+        y: 498
+        width: 179
+        height: 141
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -190,10 +211,10 @@ TextureImporter:
       name: debris_3
       rect:
         serializedVersion: 2
-        x: 847
-        y: 542
-        width: 66
-        height: 53
+        x: 717
+        y: 606
+        width: 61
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -211,10 +232,10 @@ TextureImporter:
       name: debris_4
       rect:
         serializedVersion: 2
-        x: 963
-        y: 506
-        width: 34
-        height: 22
+        x: 182
+        y: 457
+        width: 129
+        height: 100
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -229,7 +250,49 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: debris_5
+      name: debris_7
+      rect:
+        serializedVersion: 2
+        x: 847
+        y: 542
+        width: 66
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aca3fb3b67bfe4490800000000000000
+      internalID: -7759988620672419126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: debris_8
+      rect:
+        serializedVersion: 2
+        x: 963
+        y: 506
+        width: 34
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65c262eb3307f0ae0800000000000000
+      internalID: -1580921576647938986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: debris_9
       rect:
         serializedVersion: 2
         x: 94
@@ -243,14 +306,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dc591a293d50148b0800000000000000
-      internalID: -5169844490988317235
+      spriteID: fa87ad427b6d84d80800000000000000
+      internalID: -8266121033952888657
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: debris_6
+      name: debris_10
       rect:
         serializedVersion: 2
         x: 369
@@ -264,8 +327,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f2ae1ed7eed711ce0800000000000000
-      internalID: -1436228342886831569
+      spriteID: 1c15bb7be93c4a9c0800000000000000
+      internalID: -3916790689450733119
       vertices: []
       indices: 
       edges: []
