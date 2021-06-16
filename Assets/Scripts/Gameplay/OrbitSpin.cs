@@ -34,6 +34,9 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
         var position = _cameraTransform.position;
         _lastPositionX = position.x;
         _lastPositionY = position.y;
+        
+        _targetPosition = transform.position;
+        _targetRotation = transform.rotation;
     }
 
     private void Update()
@@ -44,16 +47,15 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
             float movementX = position.x - _lastPositionX;
             float movementY = position.y - _lastPositionY;
     
-            position += Vector3.up * (movementY * _movementPerYTraveled);
-            transform.position = position;
-            
+            transform.position += Vector3.up * (movementY * _movementPerYTraveled);
+
             transform.Rotate(_rotationAxis, (_roationSpeed*Time.deltaTime)+(movementX*_rotationPerXTraveled), Space.World);
             _earthTransform.Rotate(_rotationYAxis, (movementY*_rotationPerYTraveled), Space.World);
     
             _lastPositionX = position.x;
             _lastPositionY = position.y;
 
-            _targetPosition = position;
+            _targetPosition = transform.position;
             _targetRotation = transform.rotation;
         }
         else
