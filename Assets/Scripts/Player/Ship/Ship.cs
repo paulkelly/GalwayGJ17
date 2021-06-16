@@ -167,6 +167,9 @@ public class Ship : MonoBehaviourPun, IPunObservable
             _targetPosition = (Vector3)stream.ReceiveNext();
             _velocity = (Vector2)stream.ReceiveNext();
             _inputAngle = (float)stream.ReceiveNext();
+            
+            float lag = Mathf.Abs((float) (PhotonNetwork.Time - info.SentServerTime));
+            _targetPosition += lag * (Vector3)_velocity;
         }
     }
 }

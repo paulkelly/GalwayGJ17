@@ -63,12 +63,14 @@ public class Cannon : MonoBehaviourPun
     
     public void SpawnBullet(float energy)
     {
-        photonView.RPC("SpawnBulletRPC", RpcTarget.All, _spawnPoint.position, energy, (Vector2)(transform.rotation * Vector2.up), ParentSpeed);
+        photonView.RPC("SpawnBulletRPC", RpcTarget.All, _spawnPoint.position, energy, (Vector2)(transform.rotation * Vector2.up), ParentSpeed, PhotonNetwork.Time);
     }
 
     [PunRPC]
-    private void SpawnBulletRPC(Vector3 position, float energy, Vector2 forward, Vector2 velocity)
+    private void SpawnBulletRPC(Vector3 position, float energy, Vector2 forward, Vector2 velocity, double sentTime)
     {
+        float lag = Mathf.Abs((float) (PhotonNetwork.Time - sentTime));
+        position += lag * (Vector3) velocity;
         BulletPool.Spawn(_parentShip, energy, position, forward, velocity);
     }
 

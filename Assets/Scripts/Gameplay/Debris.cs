@@ -1,24 +1,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Debris : MonoBehaviour, IHittable
+public class Debris : SyncedRigidbody, IHittable
 {
     [SerializeField] private float _maxHealth;
     [SerializeField] private List<GameObject> _splitObjects;
 
-    private Rigidbody2D _rigidbody;
-    
     private bool _alive;
     private float _currentHealth;
 
-    private void Awake()
+    private void Start()
     {
         Spawn();
-        _rigidbody = GetComponent<Rigidbody2D>();
     }
 
     public void Spawn()
