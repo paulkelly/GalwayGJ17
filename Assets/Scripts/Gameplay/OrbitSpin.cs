@@ -23,7 +23,7 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
     private float _lastPositionX;
     private float _lastPositionY;
 
-    private const float SyncTime= 0.5f;
+    private const float SyncTime= 0.3f;
     private Vector3 _targetPosition;
     private Vector3 _positionVel;
     
@@ -59,24 +59,23 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
 
         _lastPositionX = position.x;
         _lastPositionY = position.y;
+
+        _targetRotation *= Quaternion.AngleAxis((_roationSpeed * Time.deltaTime) + (movementX * _rotationPerXTraveled), _rotationAxis);
+        _earthRotation *= Quaternion.AngleAxis((movementY*_rotationPerYTraveled), _rotationYAxis);
+        //transform.Rotate(_rotationAxis, (_roationSpeed*Time.deltaTime)+(movementX*_rotationPerXTraveled), Space.World);
+        //_earthTransform.Rotate(_rotationYAxis, (movementY*_rotationPerYTraveled), Space.World);
         
         if (photonView.IsMine)
         {
             transform.localPosition = _targetPosition;
+            transform.localRotation = _targetRotation;
+            _earthTransform.localRotation = _earthRotation;
         }
         else
         {
             transform.localPosition = Vector3.SmoothDamp(transform.localPosition, _targetPosition, ref _positionVel, SyncTime);
             transform.localRotation = QuaternionUtil.SmoothDamp(transform.localRotation, _targetRotation, ref _rotVel, SyncTime);
             _earthTransform.localRotation = QuaternionUtil.SmoothDamp(_earthTransform.localRotation, _earthRotation, ref _earthRotVel, SyncTime);
-        }
-        
-        transform.Rotate(_rotationAxis, (_roationSpeed*Time.deltaTime)+(movementX*_rotationPerXTraveled), Space.World);
-        _earthTransform.Rotate(_rotationYAxis, (movementY*_rotationPerYTraveled), Space.World);
-        
-        if (photonView.IsMine)
-        {
-            _targetRotation = transform.localRotation;
         }
     }
 
