@@ -29,6 +29,7 @@ public class DebrisSpawnZone : MonoBehaviourPun
 
     private IEnumerator SpawnCo()
     {
+        //TODO: Wait until player has spawned
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(1, 4));

@@ -35,7 +35,7 @@ public class DebrisManager : MonoBehaviour
             if (randomPool.IsReady)
             {
                 Debris debris = randomPool.GetObject(position, Quaternion.AngleAxis(rotation, Vector3.forward));
-                debris.Spawn(randomPool, position, velocity, rotation, angularVelocity);
+                if(debris != null) debris.Spawn(randomPool, position, velocity, rotation, angularVelocity);
             }
         }
     }

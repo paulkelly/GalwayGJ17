@@ -9,7 +9,7 @@ public class DebrisPool : MonoBehaviour
     [SerializeField] private Debris Prefab;
     
     public DebrisManager.DebrisType Type => _type;
-    public bool IsReady => PhotonNetwork.IsConnectedAndReady;
+    public bool IsReady => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom;
 
     private readonly List<Debris> _available = new List<Debris>();
     private readonly List<Debris> _inUse = new List<Debris>();
