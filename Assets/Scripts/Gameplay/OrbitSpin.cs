@@ -55,16 +55,14 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
             _lastPositionX = position.x;
             _lastPositionY = position.y;
 
-            _targetPosition = transform.position;
-            _targetRotation = transform.rotation;
+            _targetPosition = transform.localPosition;
+            _targetRotation = transform.localRotation;
         }
         else
         {
-            transform.position = Vector3.SmoothDamp(transform.position, _targetPosition, ref _positionVel, SyncTime);
-            transform.rotation = QuaternionUtil.SmoothDamp(transform.rotation, _targetRotation, ref _rotVel, SyncTime);
+            transform.localPosition = Vector3.SmoothDamp(transform.localPosition, _targetPosition, ref _positionVel, SyncTime);
+            transform.localRotation = QuaternionUtil.SmoothDamp(transform.localRotation, _targetRotation, ref _rotVel, SyncTime);
         }
-        
-        
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
