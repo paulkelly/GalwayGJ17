@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class PooledObject : MonoBehaviour
+public abstract class PooledObject : MonoBehaviour, IPooledObject
 {
     public void Get()
     {

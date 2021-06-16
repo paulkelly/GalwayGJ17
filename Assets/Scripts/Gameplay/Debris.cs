@@ -6,30 +6,37 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Debris : MonoBehaviourPun, IHittable
+public class Debris : MonoBehaviourPun, IHittable, IPooledObject
 {
     [SerializeField] private float _maxHealth;
-    [SerializeField] private List<GameObject> _splitObjects;
+    [SerializeField] private List<SpawnOnDestroy> _splitInto;
 
+    private Rigidbody2D _rigidbody;
+    private DebrisPool _pool;
+    
     private bool _alive;
     private float _currentHealth;
     
-    protected Rigidbody2D _rigidbody;
     
     private void Awake()
     {
-        _rigidbody = GetComponent<Rigidbody2D>();
-    }
-
-    private void Start()
-    {
-        Spawn();
-    }
-
-    public void Spawn()
-    {
+        if(_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>();
         _alive = true;
         _currentHealth = _maxHealth;
+    }
+
+    public void Spawn(DebrisPool pool, Vector2 position, Vector2 velocity, float rotation, float angularVelocity)
+    {
+        if(_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>();
+        
+        _pool = pool;
+        _alive = true;
+        _currentHealth = _maxHealth;
+
+        _rigidbody.position = position;
+        _rigidbody.velocity = velocity;
+        _rigidbody.rotation = rotation;
+        _rigidbody.angularVelocity = angularVelocity;
     }
 
     public void Hit(Vector2 impact, Vector2 position, float energy)
@@ -45,60 +52,40 @@ public class Debris : MonoBehaviourPun, IHittable
 
     private void Kill()
     {
-        foreach (var splitObj in _splitObjects)
+        float splitVelocity = Random.Range(0.75f, 2f);
+        foreach (var split in _splitInto)
         {
-            splitObj.transform.parent = null;
-            splitObj.SetActive(true);
-            
-            Rigidbody2D splitBody = splitObj.GetComponent<Rigidbody2D>();
-            if (splitBody != null)
-            {
-                splitBody.velocity = _rigidbody.velocity;
-                splitBody.angularVelocity = _rigidbody.angularVelocity;
-                splitBody.AddForce((transform.position - splitObj.transform.position) * Random.Range(1000, 1400));
-                splitBody.AddTorque(Random.Range(-100, 100));
-            }
+            Vector2 awayVelocity = (_rigidbody.position - (Vector2)split.Position.position) * Random.Range(splitVelocity-0.5f, splitVelocity+0.5f);
+            float randomAngularVelocity = DebrisManager.RandomAngularVelocity;
+            DebrisManager.Spawn(split.Type, split.Position.position, _rigidbody.velocity+awayVelocity, _rigidbody.rotation, _rigidbody.angularVelocity+ randomAngularVelocity);
         }
-        Destroy(gameObject);
+
+        if (_pool == null)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            _pool.ReleaseObject(this);   
+        }
     }
-    
-    //
-    //
-    // protected Rigidbody2D _rigidbody;
-    //
-    // private void Awake()
-    // {
-    //     _rigidbody = GetComponent<Rigidbody2D>();
-    // }
-    //
-    // private void OnEnable()
-    // {
-    //     RigidybodySyncQueue.Subscribe(this);
-    // }
-    //
-    // private void OnDisable()
-    // {
-    //     RigidybodySyncQueue.UnSubscribe(this);
-    // }
-    //
-    // public void Sync()
-    // {
-    //     if (photonView.IsMine)
-    //     {
-    //         photonView.RPC("SyncRPC", RpcTarget.Others, _rigidbody.position, _rigidbody.velocity, _rigidbody.rotation, _rigidbody.angularVelocity, PhotonNetwork.Time);
-    //     }
-    // }
-    //
-    // [PunRPC]
-    // private void SyncRPC(Vector2 position, Vector2 velocity, float rotation, float angularVel, double sentTime)
-    // {
-    //     float lag = Mathf.Abs((float) (PhotonNetwork.Time - sentTime));
-    //         
-    //     _rigidbody.position = position + (velocity*lag);
-    //     _rigidbody.velocity = velocity;
-    //     _rigidbody.rotation = rotation + (angularVel*lag);
-    //     _rigidbody.angularVelocity = angularVel;
-    //     
-    //     Debug.Log("Synced: " + name);
-    // }
+
+    #region IObjectPool
+    public void Get()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Release()
+    {
+        gameObject.SetActive(false);
+    }
+    #endregion
+}
+
+[Serializable]
+public class SpawnOnDestroy
+{
+    public DebrisManager.DebrisType Type;
+    public Transform Position;
 }

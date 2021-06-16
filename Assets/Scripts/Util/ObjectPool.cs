@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPool<T> : MonoBehaviour where T : PooledObject
+public class ObjectPool<T> : MonoBehaviour where T : MonoBehaviour, IPooledObject
 {
-    public PooledObject Type;
+    public MonoBehaviour Type;
 
     private readonly List<T> _available = new List<T>();
     private readonly List<T> _inUse = new List<T>();
