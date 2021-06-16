@@ -8,7 +8,7 @@ public class RigidybodySyncQueue : MonoBehaviour
     private const int NumberToSyncPerUpdate = 2;
 
     private static RigidybodySyncQueue _instance;
-    private static List<SyncedRigidbody> _syncQueue = new List<SyncedRigidbody>();
+    private static List<Debris> _syncQueue = new List<Debris>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void OnGameStart()
@@ -30,12 +30,12 @@ public class RigidybodySyncQueue : MonoBehaviour
         }
     }
 
-    public static void Subscribe(SyncedRigidbody rigidbody)
+    public static void Subscribe(Debris rigidbody)
     {
         _syncQueue.Add(rigidbody);
     }
 
-    public static void UnSubscribe(SyncedRigidbody rigidbody)
+    public static void UnSubscribe(Debris rigidbody)
     {
         _syncQueue.Remove(rigidbody);
     }
@@ -45,7 +45,7 @@ public class RigidybodySyncQueue : MonoBehaviour
         int toProcess = Math.Max(NumberToSyncPerUpdate, _syncQueue.Count);
         for (int i = 0; i < toProcess; i++)
         {
-            SyncedRigidbody toSync = _syncQueue[0];
+            Debris toSync = _syncQueue[0];
             toSync.Sync();
             _syncQueue.RemoveAt(0);
             _syncQueue.Add(toSync);
