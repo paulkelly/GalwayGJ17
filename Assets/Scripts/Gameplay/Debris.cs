@@ -33,6 +33,9 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
         _alive = true;
         _currentHealth = _maxHealth;
 
+        transform.position = position;
+        transform.rotation = Quaternion.AngleAxis(rotation, Vector3.forward);
+        
         _rigidbody.position = position;
         _rigidbody.velocity = velocity;
         _rigidbody.rotation = rotation;
