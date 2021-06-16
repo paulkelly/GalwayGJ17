@@ -23,11 +23,15 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
     private float _lastPositionX;
     private float _lastPositionY;
 
-    private const float SyncTime= 0.3f;
+    private const float SyncTime= 0.5f;
     private Vector3 _targetPosition;
-    private Quaternion _targetRotation;
     private Vector3 _positionVel;
+    
+    private Quaternion _targetRotation;
     private Quaternion _rotVel;
+    
+    private Quaternion _earthRotation;
+    private Quaternion _earthRotVel;
 
     private void Start()
     {
@@ -35,33 +39,44 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
         _lastPositionX = position.x;
         _lastPositionY = position.y;
         
-        _targetPosition = transform.position;
-        _targetRotation = transform.rotation;
+        _targetPosition = transform.localPosition;
+        _targetRotation = transform.localRotation;
+        _earthRotation = _earthTransform.localRotation;
     }
 
     private void Update()
     {
         if (photonView.IsMine)
         {
-            var position = _cameraTransform.position;
-            float movementX = position.x - _lastPositionX;
-            float movementY = position.y - _lastPositionY;
-    
-            transform.position += Vector3.up * (movementY * _movementPerYTraveled);
-
-            transform.Rotate(_rotationAxis, (_roationSpeed*Time.deltaTime)+(movementX*_rotationPerXTraveled), Space.World);
-            _earthTransform.Rotate(_rotationYAxis, (movementY*_rotationPerYTraveled), Space.World);
-    
-            _lastPositionX = position.x;
-            _lastPositionY = position.y;
-
             _targetPosition = transform.localPosition;
-            _targetRotation = transform.localRotation;
+        }
+        
+        var position = _cameraTransform.position;
+        float movementX = position.x - _lastPositionX;
+        float movementY = position.y - _lastPositionY;
+    
+        _targetPosition += Vector3.up * (movementY * _movementPerYTraveled);
+
+        _lastPositionX = position.x;
+        _lastPositionY = position.y;
+        
+        if (photonView.IsMine)
+        {
+            transform.localPosition = _targetPosition;
         }
         else
         {
             transform.localPosition = Vector3.SmoothDamp(transform.localPosition, _targetPosition, ref _positionVel, SyncTime);
             transform.localRotation = QuaternionUtil.SmoothDamp(transform.localRotation, _targetRotation, ref _rotVel, SyncTime);
+            _earthTransform.localRotation = QuaternionUtil.SmoothDamp(_earthTransform.localRotation, _earthRotation, ref _earthRotVel, SyncTime);
+        }
+        
+        transform.Rotate(_rotationAxis, (_roationSpeed*Time.deltaTime)+(movementX*_rotationPerXTraveled), Space.World);
+        _earthTransform.Rotate(_rotationYAxis, (movementY*_rotationPerYTraveled), Space.World);
+        
+        if (photonView.IsMine)
+        {
+            _targetRotation = transform.localRotation;
         }
     }
 
@@ -71,11 +86,13 @@ public class OrbitSpin : MonoBehaviourPun, IPunObservable
         {
             stream.SendNext(_targetPosition);
             stream.SendNext(_targetRotation);
+            stream.SendNext(_earthRotation);
         }
         else
         {
             _targetPosition = (Vector3)stream.ReceiveNext();
             _targetRotation = (Quaternion)stream.ReceiveNext();
+            _earthRotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }
