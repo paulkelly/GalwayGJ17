@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class OrbitSpin : MonoBehaviour
+public class OrbitSpin : MonoBehaviourPun, IPunObservable
 {
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] private Transform _earthTransform;
@@ -22,6 +23,12 @@ public class OrbitSpin : MonoBehaviour
     private float _lastPositionX;
     private float _lastPositionY;
 
+    private const float SyncTime= 0.3f;
+    private Vector3 _targetPosition;
+    private Quaternion _targetRotation;
+    private Vector3 _positionVel;
+    private Quaternion _rotVel;
+
     private void Start()
     {
         var position = _cameraTransform.position;
@@ -31,15 +38,44 @@ public class OrbitSpin : MonoBehaviour
 
     private void Update()
     {
-        var position = _cameraTransform.position;
-        float movementX = position.x - _lastPositionX;
-        float movementY = position.y - _lastPositionY;
+        if (photonView.IsMine)
+        {
+            var position = _cameraTransform.position;
+            float movementX = position.x - _lastPositionX;
+            float movementY = position.y - _lastPositionY;
+    
+            position += Vector3.up * (movementY * _movementPerYTraveled);
+            transform.position = position;
+            
+            transform.Rotate(_rotationAxis, (_roationSpeed*Time.deltaTime)+(movementX*_rotationPerXTraveled), Space.World);
+            _earthTransform.Rotate(_rotationYAxis, (movementY*_rotationPerYTraveled), Space.World);
+    
+            _lastPositionX = position.x;
+            _lastPositionY = position.y;
 
-        transform.position += Vector3.up * (movementY * _movementPerYTraveled);
-        transform.Rotate(_rotationAxis, (_roationSpeed*Time.deltaTime)+(movementX*_rotationPerXTraveled), Space.World);
-        _earthTransform.Rotate(_rotationYAxis, (movementY*_rotationPerYTraveled), Space.World);
+            _targetPosition = position;
+            _targetRotation = transform.rotation;
+        }
+        else
+        {
+            transform.position = Vector3.SmoothDamp(transform.position, _targetPosition, ref _positionVel, SyncTime);
+            transform.rotation = QuaternionUtil.SmoothDamp(transform.rotation, _targetRotation, ref _rotVel, SyncTime);
+        }
+        
+        
+    }
 
-        _lastPositionX = position.x;
-        _lastPositionY = position.y;
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(_targetPosition);
+            stream.SendNext(_targetRotation);
+        }
+        else
+        {
+            _targetPosition = (Vector3)stream.ReceiveNext();
+            _targetRotation = (Quaternion)stream.ReceiveNext();
+        }
     }
 }
