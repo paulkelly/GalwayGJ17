@@ -52,12 +52,17 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
 
     private void Kill()
     {
-        float splitVelocity = Random.Range(0.75f, 2f);
-        foreach (var split in _splitInto)
+        if (photonView.IsMine)
         {
-            Vector2 awayVelocity = (_rigidbody.position - (Vector2)split.Position.position) * Random.Range(splitVelocity-0.5f, splitVelocity+0.5f);
-            float randomAngularVelocity = DebrisManager.RandomAngularVelocity;
-            DebrisManager.Spawn(split.Type, split.Position.position, _rigidbody.velocity+awayVelocity, _rigidbody.rotation, _rigidbody.angularVelocity+ randomAngularVelocity);
+            float splitVelocity = Random.Range(0.75f, 2f);
+            foreach (var split in _splitInto)
+            {
+                Vector2 awayVelocity = (_rigidbody.position - (Vector2) split.Position.position) *
+                                       Random.Range(splitVelocity - 0.5f, splitVelocity + 0.5f);
+                float randomAngularVelocity = DebrisManager.RandomAngularVelocity;
+                DebrisManager.Spawn(split.Type, split.Position.position, _rigidbody.velocity + awayVelocity,
+                    _rigidbody.rotation, _rigidbody.angularVelocity + randomAngularVelocity);
+            }
         }
 
         if (_pool == null)
