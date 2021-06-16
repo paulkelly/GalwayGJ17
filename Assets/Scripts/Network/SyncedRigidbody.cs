@@ -41,5 +41,7 @@ public class SyncedRigidbody : MonoBehaviourPun
         _rigidbody.velocity = velocity;
         _rigidbody.rotation = rotation + (angularVel*lag);
         _rigidbody.angularVelocity = angularVel;
+        
+        Debug.Log("Synced: " + name);
     }
 }
