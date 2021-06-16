@@ -14,6 +14,9 @@ public class Ship : MonoBehaviourPun, IPunObservable
     private const float InputDeadZone = 0.04f;
     private const float RotationTime = 0.3f;
     private const float AngularVelStopTime = 0.3f;
+    
+    [SerializeField] private float _upperYBounds;
+    [SerializeField] private float _lowerYBounds;
 
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _minAccelerateTime;
@@ -86,6 +89,8 @@ public class Ship : MonoBehaviourPun, IPunObservable
             if (_shieldDisabledTime > ShieldDisableTime) ShieldDisabled = false;
         }
         ForwardVector = transform.rotation * Vector2.up;
+        if (transform.position.y > _upperYBounds) ThurstVector = new Vector2(ThurstVector.x, Mathf.Min(ThurstVector.y, 0));
+        if (transform.position.y < _lowerYBounds) ThurstVector = new Vector2(ThurstVector.x, Mathf.Max(ThurstVector.y, 0));
         _thrustMulti = _thrustAngleMultiplierCurve.Evaluate(Mathf.Clamp01(Vector2.Dot(ForwardVector, ThurstVector)));
 
         _thrust = Mathf.Clamp01(ThrustAllocation * _thrustMulti);
