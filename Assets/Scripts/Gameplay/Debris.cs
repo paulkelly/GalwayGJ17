@@ -73,10 +73,23 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
     #region IObjectPool
     public void Get()
     {
+        photonView.RPC("EnableRPC", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    private void EnableRPC()
+    {
         gameObject.SetActive(true);
     }
 
+    
     public void Release()
+    {
+        photonView.RPC("ReleaseRPC", RpcTarget.AllBuffered);
+    }
+    
+    [PunRPC]
+    private void ReleaseRPC()
     {
         gameObject.SetActive(false);
     }
