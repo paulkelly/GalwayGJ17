@@ -14,6 +14,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
     private const float InputDeadZone = 0.04f;
     private const float RotationTime = 0.3f;
     private const float AngularVelStopTime = 0.3f;
+    private const float SyncPositionTime = 0.3f;
     
     [SerializeField] private float _upperYBounds;
     [SerializeField] private float _lowerYBounds;
@@ -54,6 +55,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
     private Vector2 _acceleration;
     // Only used for non host players
     private Vector3 _targetPosition;
+    private Vector2 _syncPositionDampVel;
 
     private float _shieldDisabledTime;
     
@@ -119,6 +121,11 @@ public class Ship : MonoBehaviourPun, IPunObservable
         {
             _targetPosition = transform.position;
         }
+        else
+        {
+            _rigidbody.position = Vector2.SmoothDamp(_rigidbody.position, _targetPosition, ref _syncPositionDampVel,
+                SyncPositionTime);
+        }
         
         Vector2 targetVelocity = (_maxSpeed * _thrust) * ThurstVector;
         bool accelerating = targetVelocity.sqrMagnitude > _velocity.sqrMagnitude;
@@ -170,6 +177,11 @@ public class Ship : MonoBehaviourPun, IPunObservable
             
             float lag = Mathf.Abs((float) (PhotonNetwork.Time - info.SentServerTime));
             _targetPosition += lag * (Vector3)_velocity;
+
+            if (Vector2.Distance(_targetPosition, _rigidbody.position) > 3)
+            {
+                _rigidbody.position = _targetPosition;
+            }
         }
     }
 }
