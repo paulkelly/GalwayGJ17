@@ -37,10 +37,10 @@ public class Bullet : PooledObject
         _ship = ship;
         Energy = energy;
         float normalEnergy = Mathf.InverseLerp(Cannon.MinEnergy, Cannon.MaxEnergy, Energy);
-        _collider.radius = Mathf.Lerp(0.4f, 0.8f, normalEnergy);
+        _collider.radius = Mathf.Lerp(0.5f, 0.8f, normalEnergy);
         _mainModule = _particleSystem.main;
         _mainModule.startLifetimeMultiplier = Mathf.Lerp(0.1f, 0.3f, normalEnergy);
-        _mainModule.startSizeMultiplier = Mathf.Lerp(0.3f, 2f, normalEnergy);
+        _mainModule.startSizeMultiplier = Mathf.Lerp(0.3f, 1.2f, normalEnergy);
         _mainModule.startColor = Color.Lerp(_lowEnergyColor, _highEnergyColor, normalEnergy);
 
         transform.position = position;
@@ -68,6 +68,7 @@ public class Bullet : PooledObject
 
     public void OnHit()
     {
+        BulletHitPool.Spawn(_rigidbody.position);
         _despawnCallback?.Invoke();
     }
 

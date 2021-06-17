@@ -9,7 +9,7 @@ using UnityEngine.Serialization;
 public class Ship : MonoBehaviourPun, IPunObservable
 {
     public const float MaxShield = 100;
-    private const float ShieldRechargeRate = 10;
+    private const float ShieldRechargeRate = 4;
     private const float ShieldDisableTime = 1f;
     private const float InputDeadZone = 0.04f;
     private const float RotationTime = 0.3f;
@@ -36,6 +36,8 @@ public class Ship : MonoBehaviourPun, IPunObservable
     // Input Paramaters
     public Vector2 ThurstVector { get; set; }
     public Vector2 CannonVector { get; set; }
+    public Vector2 FirstCannonVector { get; set; }
+    public Vector2 SecondCannonVector { get; set; }
     public float ThrustAllocation { get; set; }
     public float CannonAllocation { get; set; }
     // Thrust vector defaults to ForwardVector if button pressed with stick input
@@ -108,9 +110,14 @@ public class Ship : MonoBehaviourPun, IPunObservable
         foreach (var cannon  in _cannons)
         {
             cannon.ParentSpeed = _velocity;
-            cannon.Vector = CannonVector;
-            cannon.Strength = Mathf.Clamp01(CannonAllocation);
+            //cannon.Vector = CannonVector;
+            //cannon.Strength = Mathf.Clamp01(CannonAllocation);
         }
+
+        _cannons[0].Vector = FirstCannonVector;
+        _cannons[0].Strength = FirstCannonVector.magnitude * CannonAllocation;
+        _cannons[1].Vector = SecondCannonVector;
+        _cannons[1].Strength = SecondCannonVector.magnitude * CannonAllocation;
 
         EnergyBarUI.UpdateUI(remainingEnergy, _thrust, Mathf.Clamp01(CannonAllocation), Shield/MaxShield, ShieldDisabled);
     }
@@ -150,6 +157,10 @@ public class Ship : MonoBehaviourPun, IPunObservable
             if (ThurstVector.sqrMagnitude > InputDeadZone)
             {
                 _inputAngle = -Vector2.SignedAngle(ThurstVector, Vector2.up);
+            }
+            if (CannonVector.sqrMagnitude > InputDeadZone)
+            {
+                _inputAngle = -Vector2.SignedAngle(CannonVector, Vector2.up);
             }
             else
             {

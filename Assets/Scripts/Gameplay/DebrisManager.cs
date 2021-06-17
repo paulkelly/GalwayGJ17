@@ -40,11 +40,6 @@ public class DebrisManager : MonoBehaviour
         }
     }
 
-    private void SpawnRPC(DebrisType type, Vector2 position, Vector2 velocity, float rotation, float angularVelocity)
-    {
-        
-    }
-
     private void Awake()
     {
         _instance = this;

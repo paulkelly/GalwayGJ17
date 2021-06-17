@@ -47,7 +47,8 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
         if (!_alive) return;
         _currentHealth -= energy;
         _rigidbody.AddForceAtPosition(impact * energy, position);
-        if (_currentHealth < 0)
+        DebrisHitPool.Spawn(position, impact, energy);
+        if (_currentHealth <= 0)
         {
             Kill();
         }
@@ -55,13 +56,13 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
 
     private void Kill()
     {
+        _alive = false;
         if (photonView.IsMine)
         {
-            float splitVelocity = Random.Range(0.75f, 2f);
+            float splitVelocity = Random.Range(1.5f, 3.5f);
             foreach (var split in _splitInto)
             {
-                Vector2 awayVelocity = (_rigidbody.position - (Vector2) split.Position.position) *
-                                       Random.Range(splitVelocity - 0.5f, splitVelocity + 0.5f);
+                Vector2 awayVelocity = ((Vector2) split.Position.position-_rigidbody.position) * splitVelocity;
                 float randomAngularVelocity = DebrisManager.RandomAngularVelocity;
                 DebrisManager.Spawn(split.Type, split.Position.position, _rigidbody.velocity + awayVelocity,
                     _rigidbody.rotation, _rigidbody.angularVelocity + randomAngularVelocity);
