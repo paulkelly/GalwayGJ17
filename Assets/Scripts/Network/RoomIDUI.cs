@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class RoomIDUI : MonoBehaviourPunCallbacks
 {
-    private bool ShowRoomCode { get; set; }
-
     [SerializeField]
     private GameObject _roomCodeObj;
 
@@ -16,7 +14,6 @@ public class RoomIDUI : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        ShowRoomCode = !NetworkManager.IsConnecting && !NetworkManager.IsOffline;
         if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
         {
             SetRoomCode(PhotonNetwork.CurrentRoom.Name);
@@ -29,9 +26,9 @@ public class RoomIDUI : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        if(_roomCodeObj.activeSelf != ShowRoomCode)
+        if(_roomCodeObj.activeSelf != NetworkManager.InPublicRoom)
         {
-            _roomCodeObj.SetActive(ShowRoomCode);
+            _roomCodeObj.SetActive(NetworkManager.InPublicRoom);
         }
     }
 

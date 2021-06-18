@@ -10,7 +10,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
 {
     public const float MaxShield = 100;
     private const float ShieldRechargeRate = 6;
-    private const float ShieldDisableTime = 1f;
+    private const float ShieldDisableTime = 6f;
     private const float InputDeadZone = 0.09f;
     private const float RotationTime = 0.3f;
     private const float AngularVelStopTime = 0.3f;
@@ -24,6 +24,10 @@ public class Ship : MonoBehaviourPun, IPunObservable
     [SerializeField] private float _maxAccelerateTime;
     [SerializeField] private float _deccelerateTime;
 
+    [SerializeField] private Shield _shield;
+    [SerializeField] private GameObject _bodyGameObject;
+    [SerializeField] private GameObject _followGameObject;
+    [SerializeField] private GameObject _destroyedGameObject;
     [SerializeField] private AnimationCurve _thrustAngleMultiplierCurve;
 
     private Rigidbody2D _rigidbody;
@@ -33,6 +37,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
 
     public float Shield { get; set; } = MaxShield;
     public bool ShieldDisabled { get; private set; }
+    public bool IsDestroyed { get; private set; }
     
     // Input Paramaters
     public Vector2 ThurstVector { get; set; }
@@ -61,9 +66,29 @@ public class Ship : MonoBehaviourPun, IPunObservable
     private Vector2 _syncPositionDampVel;
 
     private float _shieldDisabledTime;
-    
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (!ShieldDisabled) return;
+        
+        Rigidbody2D otherRigidbody = other.rigidbody;
+        if (otherRigidbody != null)
+        {
+            if (_shield.HasNotCollidedRecently(otherRigidbody))
+            {
+                DestroyShip();
+            }
+        }
+    }
+
     public void HandleCollision(float mass, float impactVelocity)
     {
+        if (ShieldDisabled)
+        {
+            DestroyShip();
+            return;
+        }
+        
         float damage = DamageUtil.GetDamage(mass, impactVelocity);
         if (Shield < damage)
         {
@@ -74,6 +99,14 @@ public class Ship : MonoBehaviourPun, IPunObservable
         else
         {
             Shield -= damage;
+        }
+    }
+
+    private void DestroyShip()
+    {
+        if (photonView.IsMine)
+        {
+            photonView.RPC("DestroyShipRPC", RpcTarget.All);
         }
     }
 
@@ -89,6 +122,8 @@ public class Ship : MonoBehaviourPun, IPunObservable
 
     private void Update()
     {
+        if (IsDestroyed) return;
+        
         if (ShieldDisabled)
         {
             _shieldDisabledTime += Time.deltaTime;
@@ -124,6 +159,8 @@ public class Ship : MonoBehaviourPun, IPunObservable
 
     private void HandleShipVelocity()
     {
+        if (IsDestroyed) return;
+        
         if (photonView.IsMine)
         {
             _targetPosition = transform.position;
@@ -141,10 +178,6 @@ public class Ship : MonoBehaviourPun, IPunObservable
         _velocity = Vector2.SmoothDamp(_velocity, targetVelocity, ref _acceleration, accelerating ? accelerateTime : _deccelerateTime);
 
         _rigidbody.velocity = _velocity;
-        // Vector2 moveVector = Time.deltaTime * _velocity;
-        // Vector3 position = Vector3.Lerp(transform.position, _targetPosition, 0.1f);
-        // transform.position = new Vector3(position.x + moveVector.x, position.y + moveVector.y,
-        //     position.z);
     }
 
     private void FixedUpdate()
@@ -176,6 +209,17 @@ public class Ship : MonoBehaviourPun, IPunObservable
             rcs.Rotation = Mathf.DeltaAngle(_rigidbody.rotation, _inputAngle);
         }
     }
+
+    [PunRPC]
+    public void DestroyShipRPC()
+    {
+        IsDestroyed = true;
+        
+        _rigidbody.velocity = Vector2.zero;
+        _followGameObject.SetActive(false);
+        _bodyGameObject.SetActive(false);
+        _destroyedGameObject.SetActive(true);
+    }
     
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -184,12 +228,16 @@ public class Ship : MonoBehaviourPun, IPunObservable
             stream.SendNext(transform.position);
             stream.SendNext(_velocity);
             stream.SendNext(_inputAngle);
+            stream.SendNext(Shield);
+            stream.SendNext(ShieldDisabled);
         }
         else
         {
             _targetPosition = (Vector3)stream.ReceiveNext();
             _velocity = (Vector2)stream.ReceiveNext();
             _inputAngle = (float)stream.ReceiveNext();
+            Shield = (float)stream.ReceiveNext();
+            ShieldDisabled = (bool)stream.ReceiveNext();
             
             float lag = Mathf.Abs((float) (PhotonNetwork.Time - info.SentServerTime));
             _targetPosition += lag * (Vector3)_velocity;

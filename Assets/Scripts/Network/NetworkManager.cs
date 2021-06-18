@@ -32,7 +32,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     /// </summary>
     public static bool IsConnecting { get; private set; }
     public static bool IsOffline { get; private set; }
-    
+    public static bool InPublicRoom { get; private set; }
     
     private static NetworkManager _instance;
     private static bool _isBusy;
@@ -180,6 +180,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 #if DEBUG
             if(_debug) Debug.Log("Unable to connect to internet, using offline mode");
 #endif
+            InPublicRoom = false;
             PhotonNetwork.OfflineMode = true;
             IsOffline = true;
         }
@@ -310,6 +311,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if(_debug) Debug.Log("Trying to join random room");
 #endif
         IsBusy = true;
+        InPublicRoom = true;
         if (InMainScene)
         {
             PhotonNetwork.JoinRandomRoom();
@@ -326,6 +328,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private void CreateRoom()
     {
+        InPublicRoom = true;
         IsBusy = true;
         if (InMainScene)
         {
@@ -343,6 +346,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     
     private void CreatePrivateRoom()
     {
+        InPublicRoom = false;
         IsBusy = true;
         if (InMainScene)
         {
@@ -390,6 +394,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     
     private void ReturnToLobbyLocal()
     {
+        InPublicRoom = false;
         _spawnPlayerWhenReady = false;
         BGSceneLoader.LoadLevel(LobbySceneName);
     }
@@ -397,6 +402,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     
     private void AvailableGameEntry_OnTryJoinRoom(string roomName)
     {
+        InPublicRoom = true;
         IsBusy = true;
         if (InMainScene)
         {

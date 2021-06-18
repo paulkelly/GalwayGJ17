@@ -7,6 +7,7 @@ using UnityEngine;
 public class Shield : MonoBehaviourPun
 {
     public const float ShieldShowTime = 0.6f;
+    public const float ShieldColorLerpTime = 0.4f;
     
     [SerializeField] private Ship _ship;
     [SerializeField] private ShipHitPool _shipHitPool;
@@ -16,6 +17,10 @@ public class Shield : MonoBehaviourPun
     [SerializeField] private SpriteRenderer _shieldHitRenderer;
     [SerializeField] private SpriteRenderer _shieldPermRenderer;
 
+    [SerializeField] private Color _disabledShieldColor;
+
+    private bool _shieldDisableColorSet;
+    
     private Color _defaultShieldColor;
     private float _shieldMultiplier;
     private float _lastHitTime = 0;
@@ -23,6 +28,27 @@ public class Shield : MonoBehaviourPun
     private List<RecentlyHitBodys> _recentlyHitBodys = new List<RecentlyHitBodys>();
     private List<RecentlyHitBodys> _toRemove = new List<RecentlyHitBodys>();
 
+    private void SetShieldColor(Color color)
+    {
+        StopAllCoroutines();
+        StartCoroutine(SetShieldColorCo(color));
+    }
+
+    private IEnumerator SetShieldColorCo(Color color)
+    {
+        float time = 0;
+        Color startColor = _shieldPermRenderer.color;
+        while (time < ShieldColorLerpTime)
+        {
+            time += Time.deltaTime;
+
+            _shieldPermRenderer.color = Color.Lerp(startColor, color, Mathf.Clamp01(time / ShieldColorLerpTime));
+            yield return null;
+        }
+
+        _shieldPermRenderer.color = color;
+    }
+    
     private void Start()
     {
         _defaultShieldColor = _shieldPermRenderer.color;
@@ -33,12 +59,22 @@ public class Shield : MonoBehaviourPun
         _collider.enabled = !_ship.ShieldDisabled;
         _bodyCollider.enabled = _ship.ShieldDisabled;
         _shieldMultiplier = _ship.Shield / Ship.MaxShield;
-        _shieldPermRenderer.color = new Color(_defaultShieldColor.r, _defaultShieldColor.g, _defaultShieldColor.b, _defaultShieldColor.a*_shieldMultiplier);
 
+        if (_shieldDisableColorSet != _ship.ShieldDisabled)
+        {
+            SetShieldColor(_ship.ShieldDisabled ? _disabledShieldColor : _defaultShieldColor);
+            _shieldDisableColorSet = _ship.ShieldDisabled;
+        }
+        
+        //_shieldPermRenderer.color = new Color(_defaultShieldColor.r, _defaultShieldColor.g, _defaultShieldColor.b, _defaultShieldColor.a*_shieldMultiplier);
+
+        // shield effect
         if (_lastHitTime < ShieldShowTime) _lastHitTime += Time.deltaTime;
         float shieldAlpha = Mathf.Lerp(1, 0, _lastHitTime / ShieldShowTime);
         _shieldHitRenderer.color = new Color(1, 1, 1, shieldAlpha*_shieldMultiplier);
 
+        
+        
         foreach (var body in _recentlyHitBodys)
         {
             body.TimeToIgnore -= Time.deltaTime;
@@ -59,7 +95,6 @@ public class Shield : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
-            //TODO: Don't allow consecutive hits from same collider
             Rigidbody2D otherBody = other.rigidbody;
             if (otherBody != null)
             {
@@ -86,7 +121,7 @@ public class Shield : MonoBehaviourPun
         }
     }
 
-    private bool HasNotCollidedRecently(Rigidbody2D otherBody)
+    public bool HasNotCollidedRecently(Rigidbody2D otherBody)
     {
         foreach (var body in _recentlyHitBodys)
         {
