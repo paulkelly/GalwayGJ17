@@ -31,10 +31,10 @@ RectTransform:
   m_Father: {fileID: 1275974102361035547}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 90.38513, y: 0}
-  m_SizeDelta: {x: 180.7702, y: 73.0766}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -120, y: 0}
+  m_SizeDelta: {x: 180.77026, y: 73.0766}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1275974102361035546
 GameObject:
@@ -205,9 +205,9 @@ RectTransform:
   m_Father: {fileID: 1275974102361035547}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -70, y: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 100, y: 0}
   m_SizeDelta: {x: 140, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1275974102750162258
@@ -614,6 +614,7 @@ GameObject:
   - component: {fileID: 1275974104055560189}
   - component: {fileID: 1275974104055560188}
   - component: {fileID: 1275974104055560191}
+  - component: {fileID: 5231573370148956901}
   m_Layer: 5
   m_Name: Exit
   m_TagString: Untagged
@@ -722,4 +723,28 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1275974104055560188}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5231573370148956901}
+        m_TargetAssemblyTypeName: ButtonFunctions, Assembly-CSharp
+        m_MethodName: ReturnToLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &5231573370148956901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275974104055559169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3789f39398a56724b94287f66192bd26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
