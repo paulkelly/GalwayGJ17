@@ -41,7 +41,7 @@ public class ScoreTracker : MonoBehaviourPun, IPunObservable
         }
         else
         {
-            Score = (int) stream.ReceiveNext();
+            UpdateScore((int)stream.ReceiveNext());
         }
     }
 }
