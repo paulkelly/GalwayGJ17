@@ -213,12 +213,18 @@ namespace Billygoat
             if (!LoadQueued)
             {
                 yield return new WaitForSecondsRealtime(0.1f);
-
-                yield return Instance.StartCoroutine(EndSceneTransition());
             }
-
+            
             LoadInProgress = false;
             OnSceneLoadComplete.Invoke(level);
+
+            // wait for photon to join room
+            while (NetworkManager.IsBusy)
+            {
+                yield return null;
+            }
+            
+            yield return Instance.StartCoroutine(EndSceneTransition());
         }
 
         private static IEnumerator QuitGame()

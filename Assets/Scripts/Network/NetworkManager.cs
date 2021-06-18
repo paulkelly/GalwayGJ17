@@ -74,6 +74,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private List<RoomInfo> _roomInfo;
 
+    private Action _joinRoomCallback;
+
     #region Unity Methods
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -212,7 +214,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 #if DEBUG
         if(_debug) Debug.Log("Failed to join random room, create a new one");
 #endif
-        IsBusy = false;
         CreateRoom();
     }
     
@@ -222,6 +223,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("Join room failed: " + message);
 #endif
         IsBusy = false;
+        ReturnToLobbyLocal();
     }
 
     public override void OnLeftRoom()
@@ -297,22 +299,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if(_debug) Debug.Log("Connecting to photon");
 #endif
         // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
-        if (PhotonNetwork.IsConnected)
-        {
-            if (!PhotonNetwork.InRoom)
-            {
-#if DEBUG
-                if(_debug) Debug.Log("Already connected but not in a room, try to join room");
-#endif
-                TryToJoinRoom();
-            }
-        }
-        else
+        if(!PhotonNetwork.IsConnected)
         {
             IsConnecting = PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
         }
     }
+
+    private bool InMainScene => SceneManager.GetActiveScene().name.Equals(MainSceneName);
 
     private void TryToJoinRoom()
     {
@@ -320,19 +314,52 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if(_debug) Debug.Log("Trying to join random room");
 #endif
         IsBusy = true;
-        PhotonNetwork.JoinRandomRoom();
+        if (InMainScene)
+        {
+            PhotonNetwork.JoinRandomRoom();
+        }
+        else
+        {
+            _joinRoomCallback = () =>
+            {
+                PhotonNetwork.JoinRandomRoom();
+            };
+            BGSceneLoader.LoadLevel(MainSceneName);   
+        }
     }
 
     private void CreateRoom()
     {
         IsBusy = true;
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+        if (InMainScene)
+        {
+            PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+        }
+        else
+        {
+            _joinRoomCallback = () =>
+            {
+                PhotonNetwork.CreateRoom(null, new RoomOptions {MaxPlayers = maxPlayersPerRoom});
+            };
+            BGSceneLoader.LoadLevel(MainSceneName);
+        }
     }
     
     private void CreatePrivateRoom()
     {
         IsBusy = true;
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 1, IsOpen = false, IsVisible = false});
+        if (InMainScene)
+        {
+            PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 1, IsOpen = false, IsVisible = false});
+        }
+        else
+        {
+            _joinRoomCallback = () =>
+            {
+                PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 1, IsOpen = false, IsVisible = false});
+            };
+            BGSceneLoader.LoadLevel(MainSceneName);
+        }
     }
 
     public void UpdateRoomList()
@@ -375,16 +402,29 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private void AvailableGameEntry_OnTryJoinRoom(string roomName)
     {
         IsBusy = true;
-        PhotonNetwork.JoinRoom(roomName);
+        if (InMainScene)
+        {
+            PhotonNetwork.JoinRoom(roomName);
+        }
+        else
+        {
+            _joinRoomCallback = () =>
+            {
+                PhotonNetwork.JoinRoom(roomName);
+            };
+            BGSceneLoader.LoadLevel(MainSceneName);
+        }
     }
     
     private void BGSceneLoaderOnOnSceneLoadComplete(string level)
     {
-        IsBusy = false;
-        
         if(level.Equals(LobbySceneName))
         {
             PhotonNetwork.JoinLobby();
+        }
+        else
+        {
+            _joinRoomCallback?.Invoke();
         }
     }
 }
