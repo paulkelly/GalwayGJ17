@@ -199,14 +199,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 #if DEBUG
         if(_debug) Debug.Log("Room Joined");
 #endif
-        if (_spawnPlayerWhenReady)
-        {
-            SpawnPlayerLocal();
-        }
-        else
-        {
-            BGSceneLoader.LoadLevel("MainScene");   
-        }
+        IsBusy = false;
+        
+        SpawnPlayerLocal();
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -214,6 +209,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 #if DEBUG
         if(_debug) Debug.Log("Failed to join random room, create a new one");
 #endif
+        IsBusy = false;
         CreateRoom();
     }
     
