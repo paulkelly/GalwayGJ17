@@ -4,53 +4,51 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace Billygoat.Bikes
+public class RoomIDUI : MonoBehaviourPunCallbacks
 {
-    public class RoomIDUI : MonoBehaviourPunCallbacks
+    private bool ShowRoomCode { get; set; }
+
+    [SerializeField]
+    private GameObject _roomCodeObj;
+
+    [SerializeField]
+    private TMP_Text Text;
+
+    private void Start()
     {
-        public static bool ShowRoomCode { get; set; }
-
-        [SerializeField]
-        private GameObject _roomCodeObj;
-
-        [SerializeField]
-        private TMP_Text Text;
-
-        private void Start()
-        {
-            if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
-            {
-                SetRoomCode(PhotonNetwork.CurrentRoom.Name);
-            }
-            else
-            {
-                SetRoomCode(string.Empty);
-            }
-        }
-
-        private void Update()
-        {
-            if(_roomCodeObj.activeSelf != ShowRoomCode)
-            {
-                _roomCodeObj.SetActive(ShowRoomCode);
-            }
-        }
-
-        public override void OnJoinedRoom()
+        ShowRoomCode = !NetworkManager.IsConnecting && !NetworkManager.IsOffline;
+        if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
         {
             SetRoomCode(PhotonNetwork.CurrentRoom.Name);
         }
-
-        private void SetRoomCode(string roomName)
+        else
         {
-            if (string.IsNullOrEmpty(roomName))
-            {
-                Text.text = string.Empty;
-            }
-            else
-            {
-                Text.text = GameNameHash.GetRoomCode(roomName);
-            }
+            SetRoomCode(string.Empty);
+        }
+    }
+
+    private void Update()
+    {
+        if(_roomCodeObj.activeSelf != ShowRoomCode)
+        {
+            _roomCodeObj.SetActive(ShowRoomCode);
+        }
+    }
+
+    public override void OnJoinedRoom()
+    {
+        SetRoomCode(PhotonNetwork.CurrentRoom.Name);
+    }
+
+    private void SetRoomCode(string roomName)
+    {
+        if (string.IsNullOrEmpty(roomName))
+        {
+            Text.text = string.Empty;
+        }
+        else
+        {
+            Text.text = GameNameHash.GetRoomCode(roomName);
         }
     }
 }
