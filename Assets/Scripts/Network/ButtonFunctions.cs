@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Billygoat;
 using UnityEngine;
 
 public class ButtonFunctions : MonoBehaviour
 {
     public void Quit()
     {
-        Application.Quit();
+        BGSceneLoader.Quit();
     }
     
     public void ReturnToLobby()

@@ -130,6 +130,7 @@ namespace Billygoat
 
         public static void LoadLevel(string level, bool queue = false)
         {
+            if (Instance == null) return;
             if (LoadInProgress)
             {
 #if DEBUG
