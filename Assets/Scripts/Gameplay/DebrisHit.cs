@@ -33,7 +33,7 @@ public class DebrisHit : PooledObject
         //velocity = Vector2.ClampMagnitude((velocity), ImpactSpawnVelocity);
         for (int i = 0; i < emitPerSystem.Length; i++)
         {
-            //Vector2 particleVel = velocity + new Vector2(Random.Range(-1, 1), Random.Range(-1, 1)).normalized * RandomSpawnVelocity;
+            //Vector2 particleVel = velocity + new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized * RandomSpawnVelocity;
             //_particleSystems[i].Emit(new ParticleSystem.EmitParams{velocity = particleVel}, emitPerSystem[i]);
             _particleSystems[i].Emit(emitPerSystem[i]);
         }

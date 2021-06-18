@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83bce69d83bc0774fb19fe610dc95cb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PointValue: 100
   _maxHealth: 1
   _splitInto: []
 --- !u!50 &5436529715411372192

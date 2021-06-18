@@ -117,25 +117,49 @@ public class ShipController : MonoBehaviour
             return new ProcessedCannonInputs() {First = _cannonInputsToProcess[0], Second = _cannonInputsToProcess[1]};
         }
         
-        Vector2 first = Vector2.zero;
-        Vector2 second = Vector2.zero;
-
-        foreach (var input in _cannonInputsToProcess)
+        // find the closet two angles and combine them, until left with two
+        while (_cannonInputsToProcess.Count > 2)
         {
-            if (Mathf.Abs(Vector2.Angle(averageInput, input)) < 90)
+            int toCombine1 = 0;
+            int toCombine2 = 0;
+            float bestAngle = Mathf.Infinity;
+            for (int i = 0; i < _cannonInputsToProcess.Count; i++)
             {
-                first += input;
+                for (int j = 0; j < _cannonInputsToProcess.Count; j++)
+                {
+                    if (i == j) continue;
+                    float angle = Vector2.Angle(_cannonInputsToProcess[i], _cannonInputsToProcess[j]);
+                    if(angle < bestAngle)
+                    {
+                        bestAngle = angle;
+                        toCombine1 = i;
+                        toCombine2 = j;
+                    }
+                }
             }
-            else
-            {
-                second += input;
-            }
-        }
 
-        first /= _cannonInputsToProcess.Count;
-        second /= _cannonInputsToProcess.Count;
+            _cannonInputsToProcess[toCombine1] += _cannonInputsToProcess[toCombine2];
+            _cannonInputsToProcess.RemoveAt(toCombine2);
+        }
         
-        return new ProcessedCannonInputs() {First = first, Second = second};
+        return new ProcessedCannonInputs() {First = _cannonInputsToProcess[0], Second = _cannonInputsToProcess[1]};
+
+        // Vector2 first = Vector2.zero;
+        // Vector2 second = Vector2.zero;
+        
+        // foreach (var input in _cannonInputsToProcess)
+        // {
+        //     if (Vector2.SignedAngle(averageInput, input) > 0)
+        //     {
+        //         first += input;
+        //     }
+        //     else
+        //     {
+        //         second += input;
+        //     }
+        // }
+
+        //return new ProcessedCannonInputs() {First = first.normalized, Second = second.normalized};
     }
 }
 

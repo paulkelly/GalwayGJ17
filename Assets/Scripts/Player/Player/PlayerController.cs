@@ -5,6 +5,7 @@ using Photon.Pun;
 using Rewired;
 using UnityEngine;
 using Action = RewiredConsts.Action;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviourPun, IPunObservable
 {
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     private PlayerInputFeedback _inputFeedback;
     [SerializeField] 
     private SpriteRenderer _myPlayerSpriteRenderer;
+    
     
     private Player _player;
     

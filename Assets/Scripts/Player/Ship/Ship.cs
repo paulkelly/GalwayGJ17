@@ -9,9 +9,9 @@ using UnityEngine.Serialization;
 public class Ship : MonoBehaviourPun, IPunObservable
 {
     public const float MaxShield = 100;
-    private const float ShieldRechargeRate = 4;
+    private const float ShieldRechargeRate = 6;
     private const float ShieldDisableTime = 1f;
-    private const float InputDeadZone = 0.04f;
+    private const float InputDeadZone = 0.09f;
     private const float RotationTime = 0.3f;
     private const float AngularVelStopTime = 0.3f;
     private const float SyncPositionTime = 0.3f;
@@ -29,6 +29,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
     private Rigidbody2D _rigidbody;
     private Thruster[] _thrusters;
     private Cannon[] _cannons;
+    private RCSThruster[] _rcs;
 
     public float Shield { get; set; } = MaxShield;
     public bool ShieldDisabled { get; private set; }
@@ -81,6 +82,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
         _rigidbody = GetComponent<Rigidbody2D>();
         _thrusters = GetComponentsInChildren<Thruster>();
         _cannons = GetComponentsInChildren<Cannon>();
+        _rcs = GetComponentsInChildren<RCSThruster>();
         
         ForwardVector = transform.rotation * Vector2.up;
     }
@@ -111,13 +113,11 @@ public class Ship : MonoBehaviourPun, IPunObservable
         {
             cannon.ParentSpeed = _velocity;
             //cannon.Vector = CannonVector;
-            //cannon.Strength = Mathf.Clamp01(CannonAllocation);
+            cannon.Strength = Mathf.Clamp01(CannonAllocation);
         }
 
         _cannons[0].Vector = FirstCannonVector;
-        _cannons[0].Strength = FirstCannonVector.magnitude * CannonAllocation;
         _cannons[1].Vector = SecondCannonVector;
-        _cannons[1].Strength = SecondCannonVector.magnitude * CannonAllocation;
 
         EnergyBarUI.UpdateUI(remainingEnergy, _thrust, Mathf.Clamp01(CannonAllocation), Shield/MaxShield, ShieldDisabled);
     }
@@ -158,7 +158,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
             {
                 _inputAngle = -Vector2.SignedAngle(ThurstVector, Vector2.up);
             }
-            if (CannonVector.sqrMagnitude > InputDeadZone)
+            else if (CannonVector.sqrMagnitude > InputDeadZone && Vector2.Angle(FirstCannonVector, SecondCannonVector) < 45)
             {
                 _inputAngle = -Vector2.SignedAngle(CannonVector, Vector2.up);
             }
@@ -170,6 +170,11 @@ public class Ship : MonoBehaviourPun, IPunObservable
         _rigidbody.angularVelocity = Mathf.SmoothDamp(_rigidbody.angularVelocity, 0, ref _angularDragVel,
             AngularVelStopTime);
         _rigidbody.SetRotation(Mathf.SmoothDampAngle(_rigidbody.rotation, _inputAngle, ref _rotationVel, RotationTime));
+
+        foreach (var rcs in _rcs)
+        {
+            rcs.Rotation = Mathf.DeltaAngle(_rigidbody.rotation, _inputAngle);
+        }
     }
     
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

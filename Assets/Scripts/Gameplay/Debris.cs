@@ -8,6 +8,10 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Debris : MonoBehaviourPun, IHittable, IPooledObject
 {
+    public delegate void DebrisDestoryed(int value);
+    public static event DebrisDestoryed OnDebrisDestroyed; 
+    
+    [SerializeField] private int PointValue;
     [SerializeField] private float _maxHealth;
     [SerializeField] private List<SpawnOnDestroy> _splitInto;
 
@@ -59,6 +63,7 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
         _alive = false;
         if (photonView.IsMine)
         {
+            OnDebrisDestroyed?.Invoke(PointValue);
             float splitVelocity = Random.Range(1.5f, 3.5f);
             foreach (var split in _splitInto)
             {
