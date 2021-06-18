@@ -7,7 +7,8 @@ public class RCSThruster : MonoBehaviour
 {
     private const float PlayTime = 0.05f;
     private const float EmitRate = 1/30f;
-    
+
+    [SerializeField] private AudioSource _audioSource;
     [SerializeField] private ParticleSystem _particleSystem;
 
     private Vector3 _ourVector;
@@ -38,10 +39,12 @@ public class RCSThruster : MonoBehaviour
             if (play)
             {
                 _particleSystem.Play();
+                _audioSource.Play();
             }
             else
             {
                 _particleSystem.Stop();
+                _audioSource.Stop();
             }
         }
         

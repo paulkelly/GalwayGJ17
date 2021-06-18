@@ -9,7 +9,11 @@ using Random = UnityEngine.Random;
 public class Debris : MonoBehaviourPun, IHittable, IPooledObject
 {
     public delegate void DebrisDestoryed(int value);
-    public static event DebrisDestoryed OnDebrisDestroyed; 
+    public static event DebrisDestoryed OnDebrisDestroyed;
+
+    public delegate void DebrisHit();
+
+    public static event DebrisHit OnDebrisHit;
     
     [SerializeField] private int PointValue;
     [SerializeField] private float _maxHealth;
@@ -56,14 +60,18 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
         {
             Kill();
         }
+        else
+        {
+            OnDebrisHit?.Invoke();
+        }
     }
 
     private void Kill()
     {
         _alive = false;
+        OnDebrisDestroyed?.Invoke(PointValue);
         if (photonView.IsMine)
         {
-            OnDebrisDestroyed?.Invoke(PointValue);
             float splitVelocity = Random.Range(1.5f, 3.5f);
             foreach (var split in _splitInto)
             {

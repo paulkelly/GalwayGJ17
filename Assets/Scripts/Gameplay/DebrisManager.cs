@@ -7,6 +7,9 @@ using Random = UnityEngine.Random;
 public class DebrisManager : MonoBehaviour
 {
     public static float RandomAngularVelocity => Random.Range(-30, 30);
+
+    [SerializeField] private PlaySFX _debrisHitSfx;
+    [SerializeField] private PlaySFX _debrisDestroyedSfx;
     
     private static DebrisManager _instance;
     private Dictionary<DebrisType, List<DebrisPool>> _debrisPools = new Dictionary<DebrisType, List<DebrisPool>>();
@@ -64,6 +67,27 @@ public class DebrisManager : MonoBehaviour
         }
         
         _debrisPools[type].Add(pool);
+    }
+
+    private void OnEnable()
+    {
+        Debris.OnDebrisHit += DebrisOnOnDebrisHit;
+        Debris.OnDebrisDestroyed += DebrisOnOnDebrisDestroyed;
+    }
+
+    private void OnDisable()
+    {
+        Debris.OnDebrisHit -= DebrisOnOnDebrisHit;
+        Debris.OnDebrisDestroyed -= DebrisOnOnDebrisDestroyed;
+    }
+
+    private void DebrisOnOnDebrisHit()
+    {
+        _debrisHitSfx.Play();
+    }
+    private void DebrisOnOnDebrisDestroyed(int value)
+    {
+        _debrisDestroyedSfx.Play();
     }
 
     public enum DebrisType

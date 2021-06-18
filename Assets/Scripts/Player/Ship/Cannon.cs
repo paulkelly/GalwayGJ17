@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Cannon : MonoBehaviourPun
 {
+    [SerializeField] private PlaySFX _sfx;
     [SerializeField] private ParticleSystem _shootParticles;
     [SerializeField] private Transform _spawnPoint;
     private Ship _parentShip;
@@ -71,6 +72,7 @@ public class Cannon : MonoBehaviourPun
     private void SpawnBulletRPC(Vector3 position, float energy, Vector2 forward, Vector2 velocity, double sentTime)
     {
         _shootParticles.Play();
+        _sfx.Play(Mathf.Lerp(0.7f, 1, Strength));
         float lag = Mathf.Abs((float) (PhotonNetwork.Time - sentTime));
         position += lag * (Vector3) velocity;
         BulletPool.Spawn(_parentShip, energy, position, forward, velocity);

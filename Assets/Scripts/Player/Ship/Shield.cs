@@ -18,6 +18,8 @@ public class Shield : MonoBehaviourPun
     [SerializeField] private SpriteRenderer _shieldPermRenderer;
 
     [SerializeField] private Color _disabledShieldColor;
+    [SerializeField] private PlaySFX _hitSfx;
+    [SerializeField] private PlaySFX _shieldDownSFX;
 
     private bool _shieldDisableColorSet;
     
@@ -62,6 +64,7 @@ public class Shield : MonoBehaviourPun
 
         if (_shieldDisableColorSet != _ship.ShieldDisabled)
         {
+            if(_ship.ShieldDisabled) _shieldDownSFX.Play();
             SetShieldColor(_ship.ShieldDisabled ? _disabledShieldColor : _defaultShieldColor);
             _shieldDisableColorSet = _ship.ShieldDisabled;
         }
@@ -116,6 +119,7 @@ public class Shield : MonoBehaviourPun
                     }
                     
                     _recentlyHitBodys.Add(new RecentlyHitBodys {Rigidbody = otherBody, TimeToIgnore = 0.3f});
+                    _hitSfx.Play();
                 }
             }
         }
