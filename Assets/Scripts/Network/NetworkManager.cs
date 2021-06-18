@@ -5,6 +5,7 @@ using Billygoat;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -32,8 +33,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public static bool IsConnecting { get; private set; }
     public static bool IsOffline { get; private set; }
     
+    
     private static NetworkManager _instance;
     private static bool _isBusy;
+    private static bool _spawnPlayerWhenReady;
 
     public static bool IsBusy
     {
@@ -151,7 +154,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             IsConnecting = false;
         }
 
-        if (!PhotonNetwork.OfflineMode && !PhotonNetwork.InLobby)
+        if (_spawnPlayerWhenReady)
+        {
+            JoinAnyGame();
+        }
+        else if (!PhotonNetwork.OfflineMode && !PhotonNetwork.InLobby)
         {
             PhotonNetwork.JoinLobby();
         }
@@ -190,7 +197,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 #if DEBUG
         if(_debug) Debug.Log("Room Joined");
 #endif
-        BGSceneLoader.LoadLevel("MainScene");
+        if (_spawnPlayerWhenReady)
+        {
+            SpawnPlayerLocal();
+        }
+        else
+        {
+            BGSceneLoader.LoadLevel("MainScene");   
+        }
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -214,7 +228,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         base.OnLeftRoom();
 
-        ReturnToLobby();
+        ReturnToLobbyLocal();   
     }
 
     public override void OnJoinedLobby()
@@ -233,9 +247,28 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         UpdateRoomList();
     }
     #endregion
+
+    public static void SpawnPlayer()
+    {
+        if (_instance != null)
+        {
+            _instance.SpawnPlayerLocal();
+        }
+        else
+        {
+            _spawnPlayerWhenReady = true;
+        }
+    }
     public static void ReturnToLobby()
     {
-        BGSceneLoader.LoadLevel(LobbySceneName);
+        if (PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
+        else
+        {
+            if(_instance != null) _instance.ReturnToLobbyLocal();   
+        }
     }
     
     public static void JoinAnyGame()
@@ -319,29 +352,37 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         OnGameListUpdated?.Invoke(info);
     }
     
-    private void SpawnPlayer()
+    private void SpawnPlayerLocal()
     {
+        if (IsConnecting || !PhotonNetwork.IsConnected || !PhotonNetwork.InRoom)
+        {
+            _spawnPlayerWhenReady = true;
+            return;
+        }
 #if DEBUG
         if(_debug) Debug.Log("Spawning Player");
 #endif
         PhotonNetwork.Instantiate(this._playerPrefab.name, Vector3.zero, Quaternion.identity, 0);
     }
     
+    private void ReturnToLobbyLocal()
+    {
+        _spawnPlayerWhenReady = false;
+        BGSceneLoader.LoadLevel(LobbySceneName);
+    }
+    
     
     private void AvailableGameEntry_OnTryJoinRoom(string roomName)
     {
-        PhotonNetwork.JoinRoom(roomName);
         IsBusy = true;
+        PhotonNetwork.JoinRoom(roomName);
     }
     
     private void BGSceneLoaderOnOnSceneLoadComplete(string level)
     {
         IsBusy = false;
-        if (level.Equals(MainSceneName))
-        {
-            SpawnPlayer();
-        }
-        else if(level.Equals(LobbySceneName))
+        
+        if(level.Equals(LobbySceneName))
         {
             PhotonNetwork.JoinLobby();
         }
