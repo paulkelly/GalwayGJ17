@@ -9,6 +9,8 @@ using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviourPun, IPunObservable
 {
+    private const float InputDeadZone = 0.3f;
+    
     [SerializeField]
     private PlayerIndicator _playerIndicator;
     [SerializeField]
@@ -19,7 +21,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     
     private Player _player;
     
-    private Vector2 InputDirection { get; set; }
+    private Vector2 ThrustDirection { get; set; }
+    private Vector2 ShootDirection { get; set; }
     private float Thrust { get; set; }
     private float Cannons { get; set; }
     private void Start()
@@ -39,16 +42,35 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
         if (photonView.IsMine)
         {
-            InputDirection = _player.GetAxis2D(Action.AimX, Action.AimY);
-            Thrust = _player.GetAxis(Action.Thrust);
-            Cannons = _player.GetAxis(Action.Shoot);
+            // InputDirection = _player.GetAxis2D(Action.AimX, Action.AimY);
+            // Thrust = _player.GetAxis(Action.Thrust);
+            // Cannons = _player.GetAxis(Action.Shoot);
+
+            ThrustDirection = _player.GetAxis2D(Action.ThrustX, Action.ThrustY);
+            ShootDirection = _player.GetAxis2D(Action.ShootX, Action.ShootY);
+            
+            Thrust = ThrustDirection.magnitude;
+            Cannons = ShootDirection.magnitude;
         }
 
-        _playerIndicator.InputDirection = InputDirection;
+        if (Cannons > InputDeadZone)
+        {
+            _playerIndicator.InputDirection = ShootDirection;
+            _inputFeedback.Moving = true;
+        }
+        else if (Thrust > InputDeadZone)
+        {
+            _playerIndicator.InputDirection = ThrustDirection;
+            _inputFeedback.Moving = true;
+        }
+        else
+        {
+            _inputFeedback.Moving = false;
+        }
+
         _playerIndicator.Thrust = Thrust;
         _playerIndicator.Cannons = Cannons;
-
-        _inputFeedback.Moving = InputDirection.sqrMagnitude > PlayerIndicator.InputDeadZone;
+        
         _inputFeedback.Thrusting = Thrust > 0.3f;
         _inputFeedback.Shooting = Cannons > 0.3f;
     }
@@ -57,15 +79,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
         if (stream.IsWriting)
         {
-            stream.SendNext(InputDirection);
-            stream.SendNext(Thrust);
-            stream.SendNext(Cannons);
+            stream.SendNext(ThrustDirection);
+            stream.SendNext(ShootDirection);
         }
         else
         {
-            InputDirection = (Vector2)stream.ReceiveNext();
-            Thrust = (float)stream.ReceiveNext();
-            Cannons = (float)stream.ReceiveNext();
+            ThrustDirection = (Vector2)stream.ReceiveNext();
+            ShootDirection = (Vector2)stream.ReceiveNext();
+            Thrust = ThrustDirection.magnitude;
+            Cannons = ShootDirection.magnitude;
         }
     }
 
