@@ -109,12 +109,12 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
                     _rigidbody.rotation, _rigidbody.angularVelocity + randomAngularVelocity);
             }
         }
-
-        Despawn();
     }
 
     private void Despawn()
     {
+        if (!photonView.IsMine) return;
+        
         if (_alive)
         {
             OnDebrisDespawned?.Invoke();
