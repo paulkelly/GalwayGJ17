@@ -947,6 +947,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 761619755855236322, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}
+      propertyPath: sceneViewId
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1464352946270184463, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}
+      propertyPath: sceneViewId
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939771460741139519, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}
+      propertyPath: sceneViewId
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8471649935282877756, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}
+      propertyPath: sceneViewId
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 8471649935495228798, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}
       propertyPath: m_Name
       value: Main Camera
@@ -994,6 +1010,10 @@ PrefabInstance:
     - target: {fileID: 8471649935495228802, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8471649935712468236, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}
+      propertyPath: sceneViewId
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7f83163c7d8f1345a078530be4fd491, type: 3}

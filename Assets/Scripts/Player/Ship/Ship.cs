@@ -16,6 +16,9 @@ public class Ship : MonoBehaviourPun, IPunObservable
     private const float AngularVelStopTime = 0.3f;
     private const float SyncPositionTime = 0.3f;
     
+    public delegate void GameEnd();
+    public static GameEnd OnGameEnd;
+
     [SerializeField] private float _upperYBounds;
     [SerializeField] private float _lowerYBounds;
 
@@ -227,6 +230,8 @@ public class Ship : MonoBehaviourPun, IPunObservable
         _followGameObject.SetActive(false);
         _bodyGameObject.SetActive(false);
         _destroyedGameObject.SetActive(true);
+        
+        OnGameEnd?.Invoke();
     }
     
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
