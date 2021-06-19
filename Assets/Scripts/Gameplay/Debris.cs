@@ -15,6 +15,13 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
 
     public static event DebrisHit OnDebrisHit;
     
+    public delegate void DebrisSpawned();
+
+    public static event DebrisSpawned OnDebrisSpawned;
+    public delegate void DebrisDespawned();
+
+    public static event DebrisDespawned OnDebrisDespawned;
+    
     [SerializeField] private int PointValue;
     [SerializeField] private float _maxHealth;
     [SerializeField] private List<SpawnOnDestroy> _splitInto;
@@ -24,13 +31,26 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
     
     private bool _alive;
     private float _currentHealth;
-    
+
+    private bool _hasShipReference;
+    private Ship _ship;
     
     private void Awake()
     {
         if(_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>();
         _alive = true;
         _currentHealth = _maxHealth;
+    }
+
+    private void Update()
+    {
+        if (_hasShipReference)
+        {
+            if (Vector2.Distance(_ship.Position, _rigidbody.position) > 60)
+            {
+                Despawn();
+            }
+        }
     }
 
     public void Spawn(DebrisPool pool, Vector2 position, Vector2 velocity, float rotation, float angularVelocity)
@@ -48,11 +68,20 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
         _rigidbody.velocity = velocity;
         _rigidbody.rotation = rotation;
         _rigidbody.angularVelocity = angularVelocity;
+
+        if (photonView.IsMine)
+        {
+            _ship = Ship.Instance;
+            _hasShipReference = true;
+        }
+        
+        OnDebrisSpawned?.Invoke();
     }
 
     public void Hit(Vector2 impact, Vector2 position, float energy)
     {
         if (!_alive) return;
+        
         _currentHealth -= energy;
         _rigidbody.AddForceAtPosition(impact * energy, position);
         DebrisHitPool.Spawn(position, impact, energy);
@@ -68,7 +97,6 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
 
     private void Kill()
     {
-        _alive = false;
         OnDebrisDestroyed?.Invoke(PointValue);
         if (photonView.IsMine)
         {
@@ -82,6 +110,17 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
             }
         }
 
+        Despawn();
+    }
+
+    private void Despawn()
+    {
+        if (_alive)
+        {
+            OnDebrisDespawned?.Invoke();
+            _alive = false;
+        }
+
         if (_pool == null)
         {
             Destroy(gameObject);
@@ -89,7 +128,7 @@ public class Debris : MonoBehaviourPun, IHittable, IPooledObject
         else
         {
             _pool.ReleaseObject(this);   
-        }
+        } 
     }
 
     #region IObjectPool

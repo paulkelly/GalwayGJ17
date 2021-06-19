@@ -50,10 +50,10 @@ public class ShipController : MonoBehaviour
         {
             if (player.Thrust > ThrustCannonThresholds)
             {
-                float magnitude = player.InputDirection.magnitude;
+                float magnitude = 1;
                 if (magnitude > InputDeadZone)
                 {
-                    thrustVector += player.InputDirection;
+                    thrustVector += player.ThrustDirection;
                     magnitude *= player.Thrust;
                 }
                 else
@@ -67,7 +67,7 @@ public class ShipController : MonoBehaviour
             }
             if (player.Cannons > ThrustCannonThresholds)
             {
-                Vector2 normalisedCannonVector = (player.InputDirection.normalized) * player.Cannons;
+                Vector2 normalisedCannonVector = (player.ShootDirection.normalized) * player.Cannons;
                 _cannonInputsToProcess.Add(normalisedCannonVector);
                 cannonVector += normalisedCannonVector;
                 float magnitude = player.Cannons;

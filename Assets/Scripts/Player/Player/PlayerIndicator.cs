@@ -39,7 +39,8 @@ public class PlayerIndicator : MonoBehaviour
     
     #region Input Parameters
     // Input parameters set from PlayerController
-    public Vector2 InputDirection { get; set; }
+    public Vector2 ThrustDirection { get; set; }
+    public Vector2 ShootDirection { get; set; }
     public float Thrust { get; set; }
     public float Cannons { get; set; }
     #endregion
@@ -69,10 +70,21 @@ public class PlayerIndicator : MonoBehaviour
             _moving = _playerPosition.Moving;
         }
 
-        float inputMag = InputDirection.sqrMagnitude;
+        Vector2 inputDirection = ThrustDirection;
+        
+        if (Cannons > InputDeadZone)
+        {
+            inputDirection = ShootDirection;
+        }
+        else if (Thrust > InputDeadZone)
+        {
+            inputDirection = ThrustDirection;
+        }
+
+        float inputMag = inputDirection.sqrMagnitude;
         if (inputMag > InputDeadZone)
         {
-            _inputAngle = Vector2.SignedAngle(InputDirection, Vector2.up);
+            _inputAngle = Vector2.SignedAngle(inputDirection, Vector2.up);
         }
         
         _inputDirectionIndicator.rotation = Quaternion.AngleAxis(-_inputAngle, Vector3.forward);

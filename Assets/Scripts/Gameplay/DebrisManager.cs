@@ -11,8 +11,18 @@ public class DebrisManager : MonoBehaviour
     [SerializeField] private PlaySFX _debrisHitSfx;
     [SerializeField] private PlaySFX _debrisDestroyedSfx;
     
+    [SerializeField] private int _minDebrisTargetCount;
+    [SerializeField] private int _maxDebrisTargetCount;
+    [SerializeField] private float _debrisSpawnIncreaseTime;
+    [SerializeField] private float _defaultSpawnRate;
+    
     private static DebrisManager _instance;
     private Dictionary<DebrisType, List<DebrisPool>> _debrisPools = new Dictionary<DebrisType, List<DebrisPool>>();
+    private static List<DebrisSpawnZone> _spawnZones = new List<DebrisSpawnZone>();
+    
+    private float _currentDebrisTargetCount;
+    private int _currentDebris;
+    private float _nextSpawn = 0;
     
     public static DebrisType Any
     {
@@ -43,6 +53,16 @@ public class DebrisManager : MonoBehaviour
         }
     }
 
+    public static void RegisterSpawnZone(DebrisSpawnZone zone)
+    {
+        _spawnZones.Add(zone);
+    }
+    
+    public static void RemoveSpawnZone(DebrisSpawnZone zone)
+    {
+        _spawnZones.Remove(zone);
+    }
+
     private void Awake()
     {
         _instance = this;
@@ -57,6 +77,27 @@ public class DebrisManager : MonoBehaviour
         {
             AddPool(pool.Type, pool);
         }
+
+        _currentDebrisTargetCount = _minDebrisTargetCount;
+    }
+
+    private void Update()
+    {
+        _currentDebrisTargetCount = Mathf.Clamp(_currentDebrisTargetCount + (Time.deltaTime*_debrisSpawnIncreaseTime), _minDebrisTargetCount,
+            _maxDebrisTargetCount);
+        if (_currentDebrisTargetCount < 0.1f) return;
+        float spawnRate = (_currentDebris / _currentDebrisTargetCount)*_defaultSpawnRate;
+        _nextSpawn += Time.deltaTime;
+        if (_nextSpawn > spawnRate)
+        {
+            SpawnDebrisOnRandomSpawnPoint();
+            _nextSpawn = 0;
+        }
+    }
+
+    private void SpawnDebrisOnRandomSpawnPoint()
+    {
+        _spawnZones[Random.Range(0, _spawnZones.Count)].SpawnDebris();
     }
 
     private void AddPool(DebrisType type, DebrisPool pool)
@@ -73,12 +114,19 @@ public class DebrisManager : MonoBehaviour
     {
         Debris.OnDebrisHit += DebrisOnOnDebrisHit;
         Debris.OnDebrisDestroyed += DebrisOnOnDebrisDestroyed;
+        
+        Debris.OnDebrisSpawned += DebrisOnOnDebrisSpawned;
+        Debris.OnDebrisDespawned += DebrisOnOnDebrisDespawned;
     }
+    
 
     private void OnDisable()
     {
         Debris.OnDebrisHit -= DebrisOnOnDebrisHit;
         Debris.OnDebrisDestroyed -= DebrisOnOnDebrisDestroyed;
+        
+        Debris.OnDebrisSpawned -= DebrisOnOnDebrisSpawned;
+        Debris.OnDebrisDespawned -= DebrisOnOnDebrisDespawned;
     }
 
     private void DebrisOnOnDebrisHit()
@@ -89,6 +137,17 @@ public class DebrisManager : MonoBehaviour
     {
         _debrisDestroyedSfx.Play();
     }
+    
+    private void DebrisOnOnDebrisSpawned()
+    {
+        _currentDebris++;
+    }
+    private void DebrisOnOnDebrisDespawned()
+    {
+        _currentDebris--;
+        if (_currentDebris < 0) _currentDebris = 0;
+    }
+    
 
     public enum DebrisType
     {

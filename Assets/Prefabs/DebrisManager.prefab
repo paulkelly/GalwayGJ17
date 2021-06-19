@@ -707,6 +707,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _debrisHitSfx: {fileID: 6215725680857139670}
   _debrisDestroyedSfx: {fileID: 1980454333612925188}
+  _minDebrisTargetCount: 40
+  _maxDebrisTargetCount: 80
+  _debrisSpawnIncreaseTime: 0.2
+  _defaultSpawnRate: 3
 --- !u!114 &-2606481817922271871
 MonoBehaviour:
   m_ObjectHideFlags: 0

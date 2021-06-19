@@ -53,26 +53,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             Cannons = ShootDirection.magnitude;
         }
 
-        if (Cannons > InputDeadZone)
-        {
-            _playerIndicator.InputDirection = ShootDirection;
-            _inputFeedback.Moving = true;
-        }
-        else if (Thrust > InputDeadZone)
-        {
-            _playerIndicator.InputDirection = ThrustDirection;
-            _inputFeedback.Moving = true;
-        }
-        else
-        {
-            _inputFeedback.Moving = false;
-        }
-
+        _playerIndicator.ThrustDirection = ThrustDirection;
+        _playerIndicator.ShootDirection = ShootDirection;
         _playerIndicator.Thrust = Thrust;
         _playerIndicator.Cannons = Cannons;
         
         _inputFeedback.Thrusting = Thrust > 0.3f;
         _inputFeedback.Shooting = Cannons > 0.3f;
+        _inputFeedback.Moving = (Cannons > InputDeadZone || Thrust > InputDeadZone);
     }
     
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

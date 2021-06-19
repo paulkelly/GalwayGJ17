@@ -29,6 +29,8 @@ public class Ship : MonoBehaviourPun, IPunObservable
     [SerializeField] private GameObject _followGameObject;
     [SerializeField] private GameObject _destroyedGameObject;
     [SerializeField] private AnimationCurve _thrustAngleMultiplierCurve;
+    
+    public static Ship Instance { get; private set; }
 
     private Rigidbody2D _rigidbody;
     private Thruster[] _thrusters;
@@ -38,6 +40,7 @@ public class Ship : MonoBehaviourPun, IPunObservable
     public float Shield { get; set; } = MaxShield;
     public bool ShieldDisabled { get; private set; }
     public bool IsDestroyed { get; private set; }
+    public Vector2 Position => _rigidbody.position;
     
     // Input Paramaters
     public Vector2 ThurstVector { get; set; }
@@ -106,8 +109,13 @@ public class Ship : MonoBehaviourPun, IPunObservable
     {
         if (photonView.IsMine)
         {
-            photonView.RPC("DestroyShipRPC", RpcTarget.All);
+            photonView.RPC("DestroyShipRPC", RpcTarget.AllBuffered);
         }
+    }
+
+    private void Awake()
+    {
+        Instance = this;
     }
 
     private void Start()
