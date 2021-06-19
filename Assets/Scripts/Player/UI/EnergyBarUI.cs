@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnergyBarUI : MonoBehaviour
 {
@@ -9,8 +10,11 @@ public class EnergyBarUI : MonoBehaviour
     [SerializeField] private Transform _thrustTransform;
     [SerializeField] private Transform _cannonTransform;
     [SerializeField] private Transform _shieldTransform;
-
+    //[SerializeField] private Image _shieldOverlay;
+    
     private const float UpdateSpeed = 10;
+
+    //private Vector2 _overlayOffset = new Vector2(0, 0);
 
     private static float _targetEnergyAllocation;
     private static float _targetThrustAllocation;
@@ -22,6 +26,7 @@ public class EnergyBarUI : MonoBehaviour
     private float _thrust;
     private float _cannon;
     private float _shield;
+    //private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 
     public static void UpdateUI(float energyAllocation, float thrustAllocation, float cannonAllocation, float shields, bool shieldDisabled)
     {
@@ -45,12 +50,15 @@ public class EnergyBarUI : MonoBehaviour
         _energy = Mathf.MoveTowards(_energy, _targetEnergyAllocation, UpdateSpeed * Time.deltaTime);
         _thrust = Mathf.MoveTowards(_thrust, _targetThrustAllocation, UpdateSpeed * Time.deltaTime);
         _cannon = Mathf.MoveTowards(_cannon, _targetCannonAllocation, UpdateSpeed * Time.deltaTime);
-        _shield = Mathf.MoveTowards(_shield, _targetShields, UpdateSpeed * Time.deltaTime);
+        _shield = Mathf.MoveTowards(_shield, _shieldDisabled ? 0 : _targetShields, UpdateSpeed * Time.deltaTime);
 
         _energyTransform.localScale = new Vector3(_energy, 1, 1);
         _thrustTransform.localScale = new Vector3(_thrust, 1, 1);
         _cannonTransform.localScale = new Vector3(_cannon, 1, 1);
         
         _shieldTransform.localScale = new Vector3(_shield, 1, 1);
+        //
+        // _overlayOffset = new Vector2((_overlayOffset.x - (Time.deltaTime*_energy)), _overlayOffset.y);
+        // _shieldOverlay.material.SetTextureOffset(MainTex, _overlayOffset);
     }
 }
